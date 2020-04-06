@@ -1,3 +1,1 @@
 # github-connector
-
-Test
