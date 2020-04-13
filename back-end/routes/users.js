@@ -39,9 +39,9 @@ router.post('/', function(req, res, next) {
     username, password, github_username
   } = req.body;
 
-  let createUserQuery = "INSERT INTO users(username, password, github_username, created_at) VALUES("
-  createUserQuery += "'" + username + "', '" + password + "', '"+ github_username + "', CURRENT_TIMESTAMP"
-  createUserQuery += ") returning *"
+  const createUserQuery = `INSERT INTO users(username, password, github_username, created_at) \
+VALUES('${username}', '${password}', '${github_username}', CURRENT_TIMESTAMP) returning *`
+  console.log(createUserQuery)
   makeDbQueryAndReturnResults(createUserQuery, res);
 });
 
