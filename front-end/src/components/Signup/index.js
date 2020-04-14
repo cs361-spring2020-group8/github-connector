@@ -15,7 +15,10 @@ class Signup extends React.Component {
     };
   }
 
-  handleChange = (event) => {
+  handleChange = (field, event) => {
+    this.setState({
+      [field]: event.target.value
+    })
     console.log(event.target.value);
   }
   
@@ -33,11 +36,11 @@ class Signup extends React.Component {
             <FormHeading>
               Create your account
             </FormHeading>
-            <FormInput heading="Username" type="text" value={this.state.username} onChange={this.handleChange} />
-            <FormInput heading="Name" type="text" value={this.state.name} onChange={this.handleChange} />
-            <FormInput heading="Phone Number" type="tel" value={this.state.phoneNumber} onChange={this.handleChange} />
-            <FormInput heading="Email" type="email" value={this.state.email} onChange={this.handleChange} />
-            <FormInput heading="Password" type="password" value={this.state.password} onChange={this.handleChange} />
+            <FormInput heading="Username" type="text" value={this.state.username} onChange={(event) => this.handleChange("username", event)} />
+            <FormInput heading="Name" type="text" value={this.state.name} onChange={(event) => this.handleChange("name", event)} />
+            <FormInput heading="Phone Number" type="tel" value={this.state.phoneNumber} onChange={(event) => this.handleChange("phoneNumber", event)} />
+            <FormInput heading="Email" type="email" value={this.state.email} onChange={(event) => this.handleChange("email", event)} />
+            <FormInput heading="Password" type="password" value={this.state.password} onChange={(event) => this.handleChange("password", event)} />
             <SubmitButton type="submit" value="Create account"/>
           </FormContainer>
         </RightPanel>
@@ -82,6 +85,7 @@ const FormHeading = styled.div`
 `;
 
 const SubmitButton = styled.input`
+  cursor: pointer;
   border: none;
   color: #FFFFFF;
   background: #7F337E;
