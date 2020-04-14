@@ -11,6 +11,7 @@ class Signup extends React.Component {
       email: '',
       password: '',
       phoneNumber: '',
+      name: '',
     };
   }
 
@@ -33,6 +34,10 @@ class Signup extends React.Component {
               Create your account
             </FormHeading>
             <FormInput heading="Username" type="text" value={this.state.username} onChange={this.handleChange} />
+            <FormInput heading="Name" type="text" value={this.state.name} onChange={this.handleChange} />
+            <FormInput heading="Phone Number" type="tel" value={this.state.phoneNumber} onChange={this.handleChange} />
+            <FormInput heading="Email" type="email" value={this.state.email} onChange={this.handleChange} />
+            <FormInput heading="Password" type="password" value={this.state.password} onChange={this.handleChange} />
             <SubmitButton type="submit" value="Create account"/>
           </FormContainer>
         </RightPanel>
