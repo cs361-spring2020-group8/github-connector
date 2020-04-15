@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-const { pool } = require('../config')
+const { pool } = require('../config');
+const validator = require('express-validator');
+const bcrypt = require('bcrypt');
 
 const makeDbQueryAndReturnResults = (queryString, res) => {
   pool.query(queryString, (error, results) => {
@@ -10,7 +12,7 @@ const makeDbQueryAndReturnResults = (queryString, res) => {
     }
     return res.status(200).send(results.rows);
   })
-}
+};
 
 const makeDbQueryAndReturnStatus = (queryString, res) => {
   pool.query(queryString, (error, results) => {
@@ -19,7 +21,7 @@ const makeDbQueryAndReturnStatus = (queryString, res) => {
     }
     return res.status(200);
   })
-}
+};
 
 /* GET all users */
 router.get('/', function(req, res, next) {
@@ -34,13 +36,17 @@ router.get('/:id', function(req, res, next) {
 });
 
 /* POST to create new users */
+// TODO: use express-validator to check for valid queries.
 router.post('/', function(req, res, next) {
   const {
     username, password, github_username
   } = req.body;
 
+  // TODO: need to double check this is indeed returning a hashed value.
+  const hashedPassword = bcrypt.hash(password,10);
+
   const createUserQuery = `INSERT INTO users(username, password, github_username, created_at) \
-VALUES('${username}', '${password}', '${github_username}', CURRENT_TIMESTAMP) returning *`
+VALUES('${username}', '${hashedPassword}', '${github_username}', CURRENT_TIMESTAMP) returning *`
   console.log(createUserQuery)
   makeDbQueryAndReturnResults(createUserQuery, res);
 });
