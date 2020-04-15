@@ -19,7 +19,6 @@ class Signup extends React.Component {
     this.setState({
       [field]: event.target.value
     })
-    console.log(event.target.value);
   }
   
   render() {
