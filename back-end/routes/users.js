@@ -89,18 +89,22 @@ router.get('/', jwtMW, function (req, res, next) {
 
 /* POST to create new users */
 // TODO: use express-validator to check for valid queries.
-router.post('/', function(req, res, next) {
-  const {
-    username, password, github_username
-  } = req.body;
+// UPDATED to be async (for generated proper salt)
+router.post('/', async function(req, res, next) {
+  try {
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-  // TODO: need to double check this is indeed returning a hashed value.
-  const hashedPassword = bcrypt.hash(password,10);
+    const username = req.body.username;
+    const github_username = req.body.github_username;
 
-  const createUserQuery = `INSERT INTO users(username, password, github_username, created_at) \
-VALUES('${username}', '${hashedPassword}', '${github_username}', CURRENT_TIMESTAMP) returning *`
-  console.log(createUserQuery)
-  makeDbQueryAndReturnResults(createUserQuery, res);
+    const createUserQuery = `INSERT INTO users(username, password, github_username, created_at) \
+  VALUES('${username}', '${hashedPassword}', '${github_username}', CURRENT_TIMESTAMP) returning *`
+    console.log(createUserQuery)
+    makeDbQueryAndReturnResults(createUserQuery, res);
+  } catch{
+    res.status(500).send();
+  }
 });
 
 /* DELETE user by ID. */
