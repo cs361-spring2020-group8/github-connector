@@ -7,11 +7,12 @@ class Signup extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
+      /*phoneNumber: '',
+      name: '',
+      username: '',*/
       email: '',
       password: '',
-      phoneNumber: '',
-      name: '',
+
     };
   }
 
@@ -35,9 +36,9 @@ class Signup extends React.Component {
             <FormHeading>
               Create your account
             </FormHeading>
-            <FormInput heading="Username" type="text" value={this.state.username} onChange={(event) => this.handleChange("username", event)} />
+            {/*<FormInput heading="Username" type="text" value={this.state.username} onChange={(event) => this.handleChange("username", event)} />
             <FormInput heading="Name" type="text" value={this.state.name} onChange={(event) => this.handleChange("name", event)} />
-            <FormInput heading="Phone Number" type="tel" value={this.state.phoneNumber} onChange={(event) => this.handleChange("phoneNumber", event)} />
+            <FormInput heading="Phone Number" type="tel" value={this.state.phoneNumber} onChange={(event) => this.handleChange("phoneNumber", event)} />*/}
             <FormInput heading="Email" type="email" value={this.state.email} onChange={(event) => this.handleChange("email", event)} />
             <FormInput heading="Password" type="password" value={this.state.password} onChange={(event) => this.handleChange("password", event)} />
             <SubmitButton type="submit" value="Create account"/>
