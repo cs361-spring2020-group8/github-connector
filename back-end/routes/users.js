@@ -45,46 +45,38 @@ const jwtMW = expjwt({
   secret: 'a fake key for demo purposes'
 });
 
-router.post('/login', function (req, res, next) {
-  const {
-    username, password
-  } = req.body;
-  // TODO: whats the best way to query DB for existing user?
-  // Just pseudo code for now...
-  // TODO: remember to hash / unhash password.
-  // fake DB entry just for demo purposes:
-  const user = {
-    id: 1,
-    username: fakeUser,
-    password: fakePassword,
-  };
+// UPDATED to be async for bcrypt library.
+router.post('/login', async function (req, res, next) {
 
-  if(username == user.username && password == user.password){
-    let token = jwt.sign({
-      id: user.id,
-      username: user.username
-    }, 'a fake key for demo purposes',
-        {
-          expiresIn: 123456
-        });
-    res.json({
-      success: true,
-      err: null,
-      token
+  // ie with a hashed password stored and checking against that.
+  try {
+    const query = "SELECT password FROM users WHERE username = ?";
+    const inputUsername = [req.body.username];
+
+    // initialize as invalid password value.
+    let passwordCheck = "bad";
+
+    // Not sure if this is the best way to do this query, maybe
+    // it should be a separate function.
+    pool.query(query, inputUsername, function(error, results, fields){
+      if(error){
+        res.write(JSON.stringify(error));
+        res.end();
+      }
+      // value changes if query worked.
+      passwordCheck = results[0];
     });
-  }else{
-    res.status(401).json({
-      success: false,
-      token: null,
-      err: 'Username or password incorrect.'
-    });
+
+    if(await bcrypt.compare(req.body.password, passwordCheck)){
+      res.send('Successful login.');
+    } else {
+      res.send('Login attempt failed.');
+    }
+  } catch {
+    res.status(500).send();
   }
-});
 
-/* mockup using the literal jwtMW above */
-// TODO: modify this to be a real route w/ real middleware.
-router.get('/', jwtMW, function (req, res, next) {
-  res.send('Authentication successful.');
+
 });
 
 /* POST to create new users */
