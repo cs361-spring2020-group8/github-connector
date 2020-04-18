@@ -32,3 +32,12 @@ psql show databases: `\d`
 psql use database: `\c dbname`
 psql show tables: `\dt`
 
+Change a db column type:
+```
+ALTER TABLE <tablename> ALTER COLUMN <columnname> TYPE <newtype>;
+```
+
+Find out information about a table:
+```
+\d table_name
+```
