@@ -4,6 +4,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import Dashboard from "./components/Dashboard";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 
