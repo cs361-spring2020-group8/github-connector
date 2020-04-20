@@ -1,38 +1,38 @@
 import React from 'react';
+
 import styled from 'styled-components';
 import Logo from '../../svg/Logo';
-//import FormInput from "../../shared/FormInput";
+
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link
+} from "react-router-dom";
+
+
+
+
 
 class Dashboard extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-
-        };
-    }
-
     render() {
         return (
             <DashboardContainer>
+
                 <LeftPanel>
-                    <LogoBox>
-                        <Logo fill="#FFFFFF" height="100%" />
-                        <div>
-                            Github Connector
-                        </div>
-                    </LogoBox>
-                    <NavPanel>
-                        <div>TEST-PROFILE</div>
-                        <div>TEST-FRIENDS</div>
-                        <div>TEST-???</div>
-                        <div>TEST-LINK</div>
-                        <div>TEST-SIGNOUT</div>
-                        <div>I envision these <br/>
-                            having space between<br/>
-                            them when they<br/>
-                            become links</div>
-                    </NavPanel>
-                    <FooterPanel></FooterPanel>
+
+                    <Logo fill="#FFFFFF" height="20%" />
+                    <div>
+                        Github Connector
+                    </div>
+                    <ul>
+                        <li><Link to="/">Home</Link></li>
+                        <li><Link to="/dashboard">Dashboard</Link></li>
+                        <li><Link to="/signup">Signup</Link></li>
+                        <li>TEST-LINK</li>
+                        <li>TEST-SIGNOUT</li>
+                    </ul>
+
                 </LeftPanel>
                 <RightPanel>
                     <DashboardContentContainer>
@@ -52,47 +52,26 @@ class Dashboard extends React.Component {
     }
 }
 
+
+
 const DashboardContainer = styled.div`
   display: flex;
   min-height: 100vh;
+  justify-content: space-between;
+  align-items: stretch;
 `;
 
 const LeftPanel = styled.div`
     display: flex;
-    flex-direction: column;
     width: 15vw;
-    height: 100vh;
-    background: #1A2E38;
-    color: #fff;
-    font-size: 16px;
-`;
-
-const LogoBox = styled.div`
-    
-    display: flex;
-    margin-top: 5vh;
     align-items: center;
-    justify-content: start;
-    flex-direction: column;
-    margin-bottom: 12px;
-`;
-
-const NavPanel = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     flex-direction: column;
     background: #1A2E38;
     color: #fff;
     font-size: 16px;
-    margin: 10px;
-    
+
 `;
 
-
-const FooterPanel = styled.div`
-    display: flex;
-`;
 
 const RightPanel = styled.div`
   display: flex;
@@ -105,8 +84,6 @@ const RightPanel = styled.div`
 `;
 
 const DashboardContentContainer = styled.div`
-  width: 70vw;
-  height: 60vh;
 
   background: #BBBBBB;
 `;
