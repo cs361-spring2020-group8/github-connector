@@ -1,5 +1,8 @@
+require('dotenv').config();
+
 var express = require('express');
 var router = express.Router();
+
 var bodyParser = require('body-parser');
 const { pool } = require('../config');
 const {check, validationResult} = require('express-validator');
@@ -7,7 +10,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const expjwt = require('express-jwt');
 
-const PASSWORD_MIN_LENGTH = 8
+const PASSWORD_MIN_LENGTH = 8;
 
 const makeDbQueryAndReturnResults = (queryString, res) => {
   pool.query(queryString, (error, results) => {
@@ -38,24 +41,15 @@ router.get('/:id', function(req, res, next) {
   makeDbQueryAndReturnResults(getUserQuery, res);
 });
 
-
-/* POST for logging in */
-// TODO: fix this with an .env variable?
-// jwt middleware, just fake for now until I figure out proper way:
-// read that it normally should be a .env variable.
-const jwtMW = expjwt({
-  secret: 'a fake key for demo purposes'
-});
-
 // UPDATED to be async for bcrypt library.
 router.post('/login', async function (req, res, next) {
 
   // ie with a hashed password stored and checking against that.
   try {
-    const query = "SELECT password FROM users WHERE email = ?";
+    const query = "SELECT password, id FROM users WHERE email = ?";
 
-    const { email, password } = req.body
-
+    const { email, password } = req.body;
+    let userID;
     // initialize as invalid password value.
     let passwordCheck = "bad";
 
@@ -68,19 +62,51 @@ router.post('/login', async function (req, res, next) {
       }
       // value changes if query worked.
       passwordCheck = results[0];
+      userID = results[1];
     });
 
     if(await bcrypt.compare(password, passwordCheck)){
-      res.send('Successful login.');
+      const token = jwt.sign({ userID }, process.env.ACCESS_TOKEN_SECRET);
+      res.json({
+        token: token
+      });
     } else {
-      res.send('Login attempt failed.');
+      res.status(403).send('Login attempt failed.');
     }
   } catch(err) {
     res.status(500).send(err);
   }
-
-
 });
+
+// TODO: route for when logged in, what do we want to call this?
+// just using login/success as a placeholder for now,
+// can change if we want
+app.get('/login/success', ensureToken, function(req, res, next){
+  jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, function(err, data){
+    if(err){
+      res.status(404).send('Bad token');
+    } else {
+      res.json({
+        text: 'successful login',
+        // TODO: send back relevant data, need to choose what that is
+        data: data
+      });
+    }
+  })
+});
+
+// Middleware for above get route
+function ensureToken(req, res, next) {
+  const bearerHeader = req.headers["authorization"];
+  if(typeof bearerHeader !== 'undefined'){
+    const bearer = bearerHeader.split(" ");
+    const bearerToken = bearer[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.status(403).send('Unauthorized.');
+  }
+}
 
 /* POST to create new users */
 // TODO: need to validate that a user doesn't already exist
