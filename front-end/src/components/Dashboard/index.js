@@ -25,14 +25,14 @@ class Dashboard extends React.Component {
                     <div>
                         Github Connector
                     </div>
-                    <ul>
-                        <li><Link to="/">Home</Link></li>
-                        <li><Link to="/dashboard">Dashboard</Link></li>
-                        <li><Link to="/signup">Signup</Link></li>
-                        <li>TEST-LINK</li>
-                        <li>TEST-SIGNOUT</li>
-                    </ul>
-
+                    <LinkList>
+                        <ul>
+                            <li><Link to="/">Home</Link></li>
+                            <li><Link to="/dashboard">Dashboard</Link></li>
+                            <li><Link to="/signup">Signup</Link></li>
+                            <li><Link to="/">Sign Out</Link></li>
+                        </ul>
+                    </LinkList>
                 </LeftPanel>
                 <RightPanel>
                     <DashboardContentContainer>
@@ -52,7 +52,32 @@ class Dashboard extends React.Component {
     }
 }
 
+const LinkList = styled.div`
+    display:flex;
+    justify-content: flex-start;
+    
+    ul {
+        list-style-type:none;
+    };
+    ul li {
+        margin-bottom:15px;
+    };
+    ul li a {
+            text-decoration:none;
+            color:#FFFFFF;
+            background-color:#1A2E38;
+            padding: 5px 10px 5px 10px;
+    };
 
+    ul li a:hover {
+            background-color:#39667d;
+    };
+    ul:after {
+        content: "";
+        clear:both;
+        display:block;
+    };
+`;
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -69,6 +94,8 @@ const LeftPanel = styled.div`
     background: #1A2E38;
     color: #fff;
     font-size: 16px;
+    padding-top: 7.5vh;
+   
 
 `;
 
