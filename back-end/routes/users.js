@@ -4,72 +4,52 @@ var express = require('express');
 var router = express.Router();
 
 var bodyParser = require('body-parser');
-const { pool } = require('../config');
 const {check, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const expjwt = require('express-jwt');
+
+const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
+const { makeDbQueryAndReturnResults, getRowFromDb } = require('../helpers/db-helpers')
+const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage } = require('../helpers/response-helpers')
 
 const PASSWORD_MIN_LENGTH = 8;
 
-const makeDbQueryAndReturnResults = (queryString, res) => {
-  pool.query(queryString, (error, results) => {
-    if (error) {
-      return res.status(500).send(error);
-    }
-    else if (!results || !results.rows || results.rows[0] === undefined) {
-      return res.status(500).send('An error occurred');
-    }
-    return res.status(200).send(results.rows);
-  })
-};
+// user routes
 
-// async function getRowFromDb(queryString) {
-//   let results;
-//   try {
-//     results = await pool.query(queryString)
-//   } catch (e) {
-//     throw e
-//   }
-//   return results.rows[0];
-// };
-
-// TODO: Need to validate the user has access to this query
 /* GET user by ID */
-router.get('/:id', function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
+  // verify user has permission to get this data
+  const userID = await getUserIdFromToken(req, res);
+  if (userID != req.params.id) {
+    return rejectAsUnauthorized(res);
+  }
+
   const getUserQuery = 'SELECT * FROM users WHERE id=' + req.params.id;
   makeDbQueryAndReturnResults(getUserQuery, res);
 });
 
-// UPDATED to be async for bcrypt library.
-router.post('/login', async function (req, res, next) {
+// LOGIN for existing users
+router.post('/login', [
+    check('email').exists().isEmail().normalizeEmail(),
+    check('password').exists().isLength({ min: PASSWORD_MIN_LENGTH })
+  ], async function (req, res, next) {
 
-  // ie with a hashed password stored and checking against that.
   try {
-    const query = "SELECT password, id FROM users WHERE email = ?";
-
     const { email, password } = req.body;
-    let userID;
-    // initialize as invalid password value.
-    let passwordCheck = "bad";
 
-    // Not sure if this is the best way to do this query, maybe
-    // it should be a separate function.
-    pool.query(query, email, function(error, results, fields){
-      if(error){
-        res.write(JSON.stringify(error));
-        res.end();
-      }
-      // value changes if query worked.
-      passwordCheck = results[0];
-      userID = results[1];
-    });
+    // get information about this user from the database
+    const query = `SELECT password, id FROM users WHERE email = '${email}'`;
+    const dbResults = await getRowFromDb(query);
 
+    // value changes if query worked.
+    const passwordCheck = dbResults.password;
+    const id = dbResults.id;
+
+    // check if user-supplied password matches the hashed password from the db
     if(await bcrypt.compare(password, passwordCheck)){
-      const token = jwt.sign({ userID }, process.env.ACCESS_TOKEN_SECRET);
-      res.json({
-        token: token
-      });
+      // if it does, generate and return a jwt
+      const token = createJWT(id);
+
+      res.status(200).send({ token, id });
     } else {
       res.status(403).send('Login attempt failed.');
     }
@@ -81,32 +61,10 @@ router.post('/login', async function (req, res, next) {
 // TODO: route for when logged in, what do we want to call this?
 // just using login/success as a placeholder for now,
 // can change if we want
-app.get('/login/success', ensureToken, function(req, res, next){
-  jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, function(err, data){
-    if(err){
-      res.status(404).send('Bad token');
-    } else {
-      res.json({
-        text: 'successful login',
-        // TODO: send back relevant data, need to choose what that is
-        data: data
-      });
-    }
-  })
-});
+router.get('/login/success', function(req, res, next){
+  const id = getUserIdFromToken(req);
 
-// Middleware for above get route
-function ensureToken(req, res, next) {
-  const bearerHeader = req.headers["authorization"];
-  if(typeof bearerHeader !== 'undefined'){
-    const bearer = bearerHeader.split(" ");
-    const bearerToken = bearer[1];
-    req.token = bearerToken;
-    next();
-  } else {
-    res.status(403).send('Unauthorized.');
-  }
-}
+});
 
 /* POST to create new users */
 // TODO: need to validate that a user doesn't already exist
@@ -117,42 +75,62 @@ router.post('/', [
   ], async function(req, res, next) {
     try {
 
-      // if email/password are empty, send 400 error with reasons
+      // if email or password are empty, send 400 error with reasons
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
 
+      // get email password from request body
       const { email, password } = req.body;
 
+      // salt and hash password
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(password, salt);
 
+      // create user in DB
       const createUserQuery = `INSERT INTO users(email, password, created_at) \
 VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) returning *`
-      makeDbQueryAndReturnResults(createUserQuery, res);
+
+      let dbResults = await getRowFromDb(createUserQuery);
+
+      // generate and return a jwt to inclue with the db results
+      const token = createJWT(dbResults.id);
+      dbResults['token'] = token;
+
+      return res.status(200).send(dbResults);
+
     } catch(err){
-      res.status(500).send(err);
+      return returnErrorWithMessage(res, error);
     }
 });
 
+/* PUT to update select user information */
 // Allows user to modify select attributes of his or her profile
-// TODO: Need to validate user has access to modify his/her information
-/* PATCH to update select user information */
 router.put('/:id', [
     check('email').optional().isEmail().normalizeEmail(),
     check('twitter').optional().trim().escape(),
     check('github_username').optional().trim(),
     check('phone').optional().trim(),
   ], async function(req, res, next) {
-    try {
 
+    // validate user has permission to modify this endpoint
+    const userID = await getUserIdFromToken(req, res);
+    if (userID != req.params.id) {
+      return rejectAsUnauthorized(res);
+    }
+
+    // if user can modify it, update the user's info in the database
+    try {
       if(req.body.password) {
+        // need to salt and hash password before storing it
         const password = req.body.password;
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
         req.body.password = hashedPassword
       }
+
+      console.log(req.body)
 
       let queryString = `UPDATE users set `
       for (let [key, value] of Object.entries(req.body)) {
