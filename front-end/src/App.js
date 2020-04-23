@@ -4,7 +4,6 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import Dashboard from "./components/Dashboard";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 
@@ -16,9 +15,6 @@ function App() {
       <Switch>
         <Route path="/signup">
           <Signup />
-        </Route>
-        <Route path="/dashboard">
-          <Dashboard />
         </Route>
         <Route path="/">
           <Signup />
