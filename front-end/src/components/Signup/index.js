@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import FormInput from '../../shared/FormInput';
 import { Link } from "react-router-dom";
 import Logo from '../../svg/Logo';
+import axios from 'axios';
 
 class Signup extends React.Component {
   constructor(props) {
@@ -18,13 +19,25 @@ class Signup extends React.Component {
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
   }
 
-  handleFormSubmit (event){
+  handleFormSubmit =async (event) =>{
     event.preventDefault();
     let payload={
       "email":this.state.email,
       "password":this.state.password
     }
     console.log(payload);
+    try{
+      const config = {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+
+      const res = await axios.post('/users', payload, config);
+      console.log(res.data);
+    } catch (err) {
+        console.error(err.response.data);
+    }
 
   }
 
