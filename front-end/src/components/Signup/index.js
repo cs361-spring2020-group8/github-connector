@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import FormInput from '../../shared/FormInput';
+import { Link } from "react-router-dom";
 import Logo from '../../svg/Logo';
+import axios from 'axios';
 
 class Signup extends React.Component {
   constructor(props) {
@@ -14,6 +16,29 @@ class Signup extends React.Component {
       password: '',
 
     };
+    this.handleFormSubmit = this.handleFormSubmit.bind(this);
+  }
+
+  handleFormSubmit =async (event) =>{
+    event.preventDefault();
+    let payload={
+      "email":this.state.email,
+      "password":this.state.password
+    }
+    console.log(payload);
+    try{
+      const config = {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+
+      const res = await axios.post('/users', payload, config);
+      console.log(res.data);
+    } catch (err) {
+        console.error(err.response.data);
+    }
+
   }
 
   handleChange = (field, event) => {
@@ -21,7 +46,7 @@ class Signup extends React.Component {
       [field]: event.target.value
     })
   }
-  
+
   render() {
     return (
       <SignupContainer>
@@ -36,13 +61,16 @@ class Signup extends React.Component {
             <FormHeading>
               Create your account
             </FormHeading>
+            <form onSubmit={this.handleFormSubmit}>
             {/*<FormInput heading="Username" type="text" value={this.state.username} onChange={(event) => this.handleChange("username", event)} />
             <FormInput heading="Name" type="text" value={this.state.name} onChange={(event) => this.handleChange("name", event)} />
             <FormInput heading="Phone Number" type="tel" value={this.state.phoneNumber} onChange={(event) => this.handleChange("phoneNumber", event)} />*/}
             <FormInput heading="Email" type="email" value={this.state.email} onChange={(event) => this.handleChange("email", event)} />
             <FormInput heading="Password" type="password" value={this.state.password} onChange={(event) => this.handleChange("password", event)} />
             <SubmitButton type="submit" value="Create account"/>
+            </form>
           </FormContainer>
+          <HasAccount>Already have an accout? <Link to="/login">Click HERE</Link> </HasAccount>
         </RightPanel>
       </SignupContainer>
     )
@@ -95,6 +123,11 @@ const SubmitButton = styled.input`
   font-weight: bold;
   border-radius: 4px;
   margin-top: 32px;
+`;
+
+const HasAccount = styled.div`
+  font-size: 11px;
+  padding: 40px;
 `;
 
 export default Signup;
