@@ -40,6 +40,8 @@ const LinkList = styled.div`
     
     ul {
         list-style-type:none;
+        padding:0;
+        
     };
     ul li {
         margin-bottom:15px;
