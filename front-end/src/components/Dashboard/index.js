@@ -1,20 +1,19 @@
 import React from 'react';
-import { useState, Component } from 'react'
 import styled from 'styled-components';
 import SideBarNav from "../../shared/SideBarNav";
+
 
 
 class Dashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: 'testname',
-            username: 'testusername',
-            email: 'testemail',
-            password: 'testpassword',
+            userData: []
+        }
 
-        };
+
     }
+
 
     render() {
         return (
@@ -29,7 +28,7 @@ class Dashboard extends React.Component {
                         </DashboardContentHeading>
                         <DashboardContent>
                             <div>Dashboard Content</div>
-                            <div>EMAIL:</div>
+                            <div>EMAIL: {this.props.email}</div>
                             <div>IS: </div>
                             <div>TEST</div>
                             <div>TEST</div>

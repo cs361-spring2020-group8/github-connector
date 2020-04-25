@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import FormInput from '../../shared/FormInput';
-import { Redirect } from "react-router";
 import { withRouter, Link } from "react-router-dom";
 import Logo from '../../svg/Logo';
 import axios from 'axios';
+
+
 
 
 
@@ -37,7 +38,7 @@ class Signup extends React.Component {
 
       const res = await axios.post('http://localhost:3000/users', payload, config);
       if(res.status === 200){
-        this.props.history.push('/dashboard');
+        this.props.history.push('/dashboard/');
       }
 
       console.log(res);
