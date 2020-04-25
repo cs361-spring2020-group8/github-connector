@@ -24,7 +24,7 @@ function App() {
         <Route path="/login">
           <Login />
         </Route>
-        <Route path="/" render={() => (
+        <Route exact path="/" render={() => (
           isLoggedIn() ? (
             <Redirect to="/dashboard"/>
           ) : (
