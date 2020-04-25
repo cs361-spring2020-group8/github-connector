@@ -9,7 +9,12 @@ class Dashboard extends React.Component {
         super(props);
         this.state = {
             userData: []
-        }
+        };
+        componentDidMount(){
+            const token = localStorage.getItem('access_token');
+
+        };
+
 
 
     }
@@ -29,7 +34,7 @@ class Dashboard extends React.Component {
                         <DashboardContent>
                             <div>Dashboard Content</div>
                             <div>EMAIL: {this.props.email}</div>
-                            <div>IS: </div>
+                            <div>PASSWORD: {this.props.password} </div>
                             <div>TEST</div>
                             <div>TEST</div>
                         </DashboardContent>
