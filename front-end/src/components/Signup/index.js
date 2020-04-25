@@ -39,7 +39,7 @@ class Signup extends React.Component {
       const res = await axios.post('http://localhost:3000/users', payload, config);
       if(res.status === 200){
         localStorage.removeItem('access_token');
-        localStorage.setItem('access_token', res.data.token)
+        localStorage.setItem('access_token', res.data.token);
         this.props.history.push('/dashboard/');
       }
 
