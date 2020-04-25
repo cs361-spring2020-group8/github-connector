@@ -8,7 +8,6 @@ import {
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
-import Home from "./components/Home";
 import { isLoggedIn } from './helpers/auth';
 
 function App() {
