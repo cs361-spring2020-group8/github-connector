@@ -1,9 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import FormInput from '../../shared/FormInput';
-import { Link } from "react-router-dom";
+import { Redirect } from "react-router";
+import { withRouter, Link } from "react-router-dom";
 import Logo from '../../svg/Logo';
 import axios from 'axios';
+
+
 
 class Signup extends React.Component {
   constructor(props) {
@@ -16,7 +19,6 @@ class Signup extends React.Component {
       password: '',
 
     };
-    this.handleFormSubmit = this.handleFormSubmit.bind(this);
   }
 
   handleFormSubmit =async (event) =>{
@@ -25,7 +27,7 @@ class Signup extends React.Component {
       "email":this.state.email,
       "password":this.state.password
     }
-    console.log(payload);
+
     try{
       const config = {
         headers: {
@@ -33,10 +35,16 @@ class Signup extends React.Component {
         }
       }
 
-      const res = await axios.post('/users', payload, config);
-      console.log(res.data);
+      const res = await axios.post('http://localhost:3000/users', payload, config);
+      if(res.status === 200){
+        this.props.history.push('/dashboard');
+      }
+
+      console.log(res);
+
+
     } catch (err) {
-        console.error(err.response.data);
+        console.error(err);
     }
 
   }
@@ -130,4 +138,5 @@ const HasAccount = styled.div`
   padding: 40px;
 `;
 
-export default Signup;
+
+export default withRouter(Signup);

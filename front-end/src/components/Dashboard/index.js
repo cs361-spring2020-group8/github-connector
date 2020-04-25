@@ -1,9 +1,21 @@
 import React from 'react';
+import { useState, Component } from 'react'
 import styled from 'styled-components';
 import SideBarNav from "../../shared/SideBarNav";
 
 
 class Dashboard extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            name: 'testname',
+            username: 'testusername',
+            email: 'testemail',
+            password: 'testpassword',
+
+        };
+    }
+
     render() {
         return (
             <DashboardContainer>
@@ -17,8 +29,8 @@ class Dashboard extends React.Component {
                         </DashboardContentHeading>
                         <DashboardContent>
                             <div>Dashboard Content</div>
-                            <div>TEST - This color is only to show where there content box is...</div>
-                            <div>TEST</div>
+                            <div>EMAIL:</div>
+                            <div>IS: </div>
                             <div>TEST</div>
                             <div>TEST</div>
                         </DashboardContent>
