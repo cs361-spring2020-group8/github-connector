@@ -11,9 +11,21 @@ export const RightPanel = (props) => (
       <FormInput heading="Email" type="email" value={props.email} onChange={(event) => props.onChange("email", event)} />
       <FormInput heading="Password" type="password" value={props.password} onChange={(event) => props.onChange("password", event)} />
       <SubmitButton type="submit" value={props.buttonText} />
+      <ErrorText>
+        { props.hasAuthError && "Invalid Email or Password. Please try again." }
+          
+        { props.hasServerError && "Oops! Something went wrong." }
+      </ErrorText>
     </FormContainer>
   </RightPanelContainer>
 );
+
+const ErrorText = styled.div`
+  color: red;
+  margin-top: 16px;
+  text-align: center;
+  min-height: 24px;
+`;
 
 const RightPanelContainer = styled.div`
   display: flex;

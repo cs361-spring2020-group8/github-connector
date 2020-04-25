@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { withRouter } from 'react-router';
 import { LeftPanel } from '../../shared/LeftPanel';
 import { RightPanel } from '../../shared/RightPanel';
 import * as LoginApi from '../../api/LoginApi';
@@ -10,6 +11,8 @@ class Login extends React.Component {
     this.state = {
       email: '',
       password: '',
+      hasAuthError: false,
+      hasServerError: false,
     };
   }
 
@@ -19,11 +22,26 @@ class Login extends React.Component {
     })
   }
 
-  onSubmit = async (e) => {
+  onSubmit = (e) => {
     e.preventDefault();
     const { email, password } = this.state
-    const res = await LoginApi.login(email, password);
-    console.log(res);
+    this.setState({ hasAuthError: false, hasServerError: false }, async () => {
+      try {
+        const res = await LoginApi.login(email, password);
+        if (res.status === 200) {
+          localStorage.removeItem('access_token');
+          localStorage.setItem('access_token', res.data.token)
+          this.props.history.push('/dashboard');
+        }
+      } catch (e) {
+        const { response: { status } } = e
+        if (status >= 400 && status < 500) {
+          this.setState({ hasAuthError: true });
+        } else {
+          this.setState({ hasServerError: true });
+        }
+      }
+    });
   }
 
   render() {
@@ -37,6 +55,8 @@ class Login extends React.Component {
           email={this.state.email}
           password={this.state.password}
           buttonText={"Login"}
+          hasAuthError={this.state.hasAuthError}
+          hasServerError={this.state.hasServerError}
         />
       </LoginContainer>
     )
@@ -44,7 +64,7 @@ class Login extends React.Component {
 }
 
 const LoginContainer = styled.div`
-    display: flex;
-  `;
+  display: flex;
+`;
 
-export default Login;
+export default withRouter(Login);
