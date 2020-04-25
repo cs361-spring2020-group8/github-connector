@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { LeftPanel } from '../../shared/LeftPanel';
 import { RightPanel } from '../../shared/RightPanel';
 
-class Signup extends React.Component {
+class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -18,25 +18,25 @@ class Signup extends React.Component {
       [field]: event.target.value
     })
   }
-  
+
   render() {
     return (
-      <SignupContainer>
-        <LeftPanel message="Welcome to the Github Connector App"/>
+      <LoginContainer>
+        <LeftPanel message="Welcome back" />
         <RightPanel
-          heading="Create your account"
+          heading="Sign in to continue to GitHub Connector"
           onChange={this.handleChange}
           email={this.state.email}
           password={this.state.password}
-          buttonText="Create Account"
+          buttonText={"Login"}
         />
-      </SignupContainer>
+      </LoginContainer>
     )
   }
 }
 
-const SignupContainer = styled.div`
-  display: flex;
-`;
+const LoginContainer = styled.div`
+    display: flex;
+  `;
 
-export default Signup;
+export default Login;

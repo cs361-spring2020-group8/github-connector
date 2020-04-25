@@ -7,7 +7,6 @@ class Dashboard extends React.Component {
     render() {
         return (
             <DashboardContainer>
-
                 <SideBarNav>
                 </SideBarNav>
                 <RightPanel>
