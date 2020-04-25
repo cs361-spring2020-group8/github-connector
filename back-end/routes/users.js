@@ -101,7 +101,7 @@ VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) returning *`
       return res.status(200).send(dbResults);
 
     } catch(err){
-      return returnErrorWithMessage(res, error);
+      return returnErrorWithMessage(res, err);
     }
 });
 

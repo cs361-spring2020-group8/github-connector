@@ -4,7 +4,7 @@ import FormInput from './FormInput';
 
 export const RightPanel = (props) => (
   <RightPanelContainer>
-    <FormContainer>
+    <FormContainer onSubmit={props.onSubmit}>
       <FormHeading>
         {props.heading}
       </FormHeading>
@@ -23,7 +23,7 @@ const RightPanelContainer = styled.div`
   width: 60vw;
 `;
 
-const FormContainer = styled.div`
+const FormContainer = styled.form`
   width: 30vw;
 `;
 
