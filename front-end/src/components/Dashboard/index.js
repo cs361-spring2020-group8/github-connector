@@ -19,7 +19,8 @@ class Dashboard extends React.Component {
     let decoded = jwt_decode(token);
     let userID = decoded.id;
 
-    axios.get('http://localhost:3000/users/'+ userID,{ headers:{
+    const url = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://githubconnector.herokuapp.com';
+    axios.get(`${url}/users/${userID}`,{ headers:{
       'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': 'Bearer '  + token }
