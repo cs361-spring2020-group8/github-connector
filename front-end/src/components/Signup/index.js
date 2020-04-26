@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { withRouter, Link } from "react-router-dom";
 import { LeftPanel } from '../../shared/LeftPanel';
 import { RightPanel } from '../../shared/RightPanel';
+import * as SignupApi from '../../api/SignupApi';
 
 class Signup extends React.Component {
   constructor(props) {
@@ -9,8 +11,23 @@ class Signup extends React.Component {
     this.state = {
       email: '',
       password: '',
-
     };
+  }
+
+  handleFormSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const { email, password } = this.state
+      const res = await SignupApi.signup(email, password);
+      if (res.status === 200) {
+        localStorage.removeItem('access_token');
+        localStorage.setItem('access_token', res.data.token);
+        this.props.history.push('/dashboard');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
   }
 
   handleChange = (field, event) => {
@@ -18,18 +35,23 @@ class Signup extends React.Component {
       [field]: event.target.value
     })
   }
-  
+
   render() {
     return (
       <SignupContainer>
-        <LeftPanel message="Welcome to the Github Connector App"/>
+        <LeftPanel message="Welcome to the Github Connector App" />
         <RightPanel
           heading="Create your account"
           onChange={this.handleChange}
+          onSubmit={this.handleFormSubmit}
           email={this.state.email}
           password={this.state.password}
           buttonText="Create Account"
-        />
+        >
+          <SignInText>
+            Already have an account?<Link to="/login">Click HERE</Link>
+          </SignInText>
+        </RightPanel>
       </SignupContainer>
     )
   }
@@ -39,4 +61,10 @@ const SignupContainer = styled.div`
   display: flex;
 `;
 
-export default Signup;
+const SignInText = styled.div`
+  font-size: 11px;
+  padding: 40px;
+`;
+
+
+export default withRouter(Signup);

@@ -3,8 +3,6 @@ const { pool } = require('../config');
 const { returnErrorWithMessage, returnGeneralError} = require('./response-helpers');
 
 function makeDbQueryAndReturnResults(queryString, res) {
-  console.log('indbquery')
-  console.log(queryString)
   pool.query(queryString, (error, results) => {
     if (error) {
       return returnErrorWithMessage(res, error);
@@ -12,7 +10,6 @@ function makeDbQueryAndReturnResults(queryString, res) {
     else if (!results || !results.rows || results.rows[0] === undefined) {
       return returnGeneralError(res);
     }
-    console.log(results)
     return res.status(200).send(results.rows);
   })
 };

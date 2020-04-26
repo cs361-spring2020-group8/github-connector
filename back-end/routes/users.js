@@ -130,8 +130,6 @@ router.put('/:id', [
         req.body.password = hashedPassword
       }
 
-      console.log(req.body)
-
       let queryString = `UPDATE users set `
       for (let [key, value] of Object.entries(req.body)) {
         queryString += `${key} = '${value}' `
