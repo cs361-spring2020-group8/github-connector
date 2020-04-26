@@ -101,7 +101,7 @@ VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) returning *`
       return res.status(200).send(dbResults);
 
     } catch(err){
-      return returnErrorWithMessage(res, err); //backend issue
+      return returnErrorWithMessage(res, err);
     }
 });
 
@@ -129,8 +129,6 @@ router.put('/:id', [
         const hashedPassword = await bcrypt.hash(password, salt);
         req.body.password = hashedPassword
       }
-
-      console.log(req.body)
 
       let queryString = `UPDATE users set `
       for (let [key, value] of Object.entries(req.body)) {

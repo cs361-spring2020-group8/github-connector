@@ -15,7 +15,9 @@ class SideBarNav extends React.Component {
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/signup">Signup</Link></li>
+            {/* Commenting this out for now so that the customer doesn't get confused seeing this when logged in */}
+            {/* <li><Link to="/signup">Signup</Link></li> */}
+            {/* TODO: Implement both back end and front end */}
             <li><Link to="/">Sign Out</Link></li>
           </ul>
         </LinkList>
@@ -27,11 +29,11 @@ class SideBarNav extends React.Component {
 const LinkList = styled.div`
   display:flex;
   justify-content: flex-start;
-  
+
   ul {
     list-style-type:none;
     padding:0;
-      
+
   };
   ul li {
     margin-bottom:15px;

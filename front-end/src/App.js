@@ -3,11 +3,12 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect,
 } from "react-router-dom";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
-
-
+import Login from "./components/Login";
+import { isLoggedIn } from './helpers/auth';
 
 function App() {
   return (
@@ -16,11 +17,24 @@ function App() {
         <Route path="/signup">
           <Signup />
         </Route>
-        <Route path="/dashboard">
-          <Dashboard />
+        <Route path="/dashboard" render={() => (
+          isLoggedIn() ? (
+            <Dashboard />
+          ) : (
+            <Login />
+          )
+        )}>
         </Route>
-        <Route path="/">
-          <Signup />
+        <Route path="/login">
+          <Login />
+        </Route>
+        <Route exact path="/" render={() => (
+          isLoggedIn() ? (
+            <Redirect to="/dashboard"/>
+          ) : (
+            <Login />
+          )
+        )}>
         </Route>
       </Switch>
     </Router>

@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import FormInput from '../../shared/FormInput';
-import { withRouter, Link } from "react-router-dom";
-import Logo from '../../svg/Logo';
 import axios from 'axios';
+import { withRouter, Link } from "react-router-dom";
+import { LeftPanel } from '../../shared/LeftPanel';
+import { RightPanel } from '../../shared/RightPanel';
 
 class Signup extends React.Component {
   constructor(props) {
@@ -11,33 +11,32 @@ class Signup extends React.Component {
     this.state = {
       email: '',
       password: '',
-
     };
   }
 
-  handleFormSubmit =async (event) =>{
+  handleFormSubmit = async (event) => {
     event.preventDefault();
-    let payload={
-      "email":this.state.email,
-      "password":this.state.password
-    }
+    let payload = {
+      "email": this.state.email,
+      "password": this.state.password
+    };
 
-    try{
+    try {
       const config = {
         headers: {
           'Content-Type': 'application/json'
         }
-      }
+      };
 
       const res = await axios.post('http://localhost:3000/users', payload, config);
-      if(res.status === 200){
+      if (res.status === 200) {
         localStorage.removeItem('access_token');
         localStorage.setItem('access_token', res.data.token);
-        this.props.history.push('/dashboard/');
+        this.props.history.push('/dashboard');
       }
 
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
 
   }
@@ -51,24 +50,18 @@ class Signup extends React.Component {
   render() {
     return (
       <SignupContainer>
-        <LeftPanel>
-          <Logo fill="#FFFFFF" height="25%" />
-          <div>
-            Welcome to the Github Connector App
-          </div>
-        </LeftPanel>
-        <RightPanel>
-          <FormContainer>
-            <FormHeading>
-              Create your account
-            </FormHeading>
-            <form onSubmit={this.handleFormSubmit}>
-            <FormInput heading="Email" type="email" value={this.state.email} onChange={(event) => this.handleChange("email", event)} />
-            <FormInput heading="Password" type="password" value={this.state.password} onChange={(event) => this.handleChange("password", event)} />
-            <SubmitButton type="submit" value="Create account"/>
-            </form>
-          </FormContainer>
-          <SignInText>Already have an account? <Link to="/login">Click HERE</Link> </SignInText>
+        <LeftPanel message="Welcome to the Github Connector App" />
+        <RightPanel
+          heading="Create your account"
+          onChange={this.handleChange}
+          onSubmit={this.handleFormSubmit}
+          email={this.state.email}
+          password={this.state.password}
+          buttonText="Create Account"
+        >
+          <SignInText>
+            Already have an account?<Link to="/login">Click HERE</Link>
+          </SignInText>
         </RightPanel>
       </SignupContainer>
     )
@@ -77,50 +70,6 @@ class Signup extends React.Component {
 
 const SignupContainer = styled.div`
   display: flex;
-`;
-
-const LeftPanel = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 40vw;
-  height: 100vh;
-  background: #1A2E38;
-  color: #fff;
-  font-size: 16px;
-`;
-
-const RightPanel = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 60vw;
-`;
-
-const FormContainer = styled.div`
-  width: 30vw;
-`;
-
-const FormHeading = styled.div`
-  font-size: 24px;
-  font-weight: 400;
-  color: #2C3A41;
-  margin-bottom: 32px;
-`;
-
-const SubmitButton = styled.input`
-  cursor: pointer;
-  border: none;
-  color: #FFFFFF;
-  background: #7F337E;
-  height 40px;
-  width: 100%;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 4px;
-  margin-top: 32px;
 `;
 
 const SignInText = styled.div`

@@ -52,7 +52,6 @@ class Dashboard extends React.Component {
             </DashboardContentHeading>
             <DashboardContent>
               <div>Dashboard Content</div>
-              <div>UserID: {this.state.id}</div>
               <div>Email: {this.state.email}</div>
             </DashboardContent>
           </DashboardContentContainer>
