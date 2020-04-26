@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { withRouter } from 'react-router';
+import { withRouter, Link } from 'react-router-dom';
 import { LeftPanel } from '../../shared/LeftPanel';
 import { RightPanel } from '../../shared/RightPanel';
 import * as LoginApi from '../../api/LoginApi';
@@ -57,7 +57,11 @@ class Login extends React.Component {
           buttonText={"Login"}
           hasAuthError={this.state.hasAuthError}
           hasServerError={this.state.hasServerError}
-        />
+        >
+          <SignUpText>
+            Don't have an account? <Link to="/signup">Sign up HERE</Link>
+          </SignUpText>
+        </RightPanel>
       </LoginContainer>
     )
   }
@@ -65,6 +69,12 @@ class Login extends React.Component {
 
 const LoginContainer = styled.div`
   display: flex;
+`;
+
+const SignUpText = styled.div`
+  font-size: 11px;
+  text-align: center;
+  padding-top: 32px;
 `;
 
 export default withRouter(Login);
