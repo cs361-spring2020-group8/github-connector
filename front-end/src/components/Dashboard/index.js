@@ -2,85 +2,65 @@ import React from 'react';
 import styled from 'styled-components';
 import SideBarNav from "../../shared/SideBarNav";
 import jwt_decode from 'jwt-decode'
-
-
-
+import axios from "axios";
 
 class Dashboard extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            created_at: '',
-            id: '',
-            email: '',
-            password: '',
-            isLoaded: false
-        };
-    }
-        componentDidMount() {
-            let token =  localStorage.getItem('access_token');
-            let decoded = jwt_decode(token);
-            console.log({decoded});
-            return fetch("http://localhost:3000/users/" + decoded.id, {
-                method: 'GET',
-                headers:{
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '  + token ,
-                }
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: '',
+      email: '',
+      isLoaded: false
+    };
+  }
 
-            })
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        console.log(result[0]);
-                        this.setState({
-                            isLoaded: true,
-                            id: result[0].id,
-                            email: result[0].email,
-                            password: result[0].password,
-                            created_at: result[0].created_at
-                        });
+  componentDidMount() {
+    let token = localStorage.getItem('access_token');
+    let decoded = jwt_decode(token);
+    let userID = decoded.id;
 
-                    },
-                    (error) => {
-                        this.setState({
-                            isLoaded: true,
-                            error
-                        });
-                    }
-                )
+    axios.get('http://localhost:3000/users/'+ userID,{ headers:{
+      'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '  + token }
+    }).then(
+      (result) => {
+        this.setState({
+          isLoaded: true,
+          id: result.data[0].id,
+          email: result.data[0].email,
+        });
+      },
+      (error) => {
+        this.setState({
+          isLoaded: true,
+          error
+        });
+      }
+    )
+  }
 
-        }
-
-
-
-    render() {
-        return (
-            <DashboardContainer>
-
-                <SideBarNav>
-                </SideBarNav>
-                <RightPanel>
-                    <DashboardContentContainer>
-                        <DashboardContentHeading>
-                            Dashboard Content Header
-                        </DashboardContentHeading>
-                        <DashboardContent>
-                            <div>Dashboard Content</div>
-                            <div>UserID: {this.state.id}</div>
-                            <div>Email: {this.state.email}</div>
-                            <div>Password: {this.state.password} </div>
-                            <div>Created: {this.state.created_at}</div>
-                        </DashboardContent>
-                    </DashboardContentContainer>
-                </RightPanel>
-            </DashboardContainer>
-        )
-    }
+  render() {
+    return (
+      <DashboardContainer>
+        <SideBarNav>
+        </SideBarNav>
+        <RightPanel>
+          <DashboardContentContainer>
+            <DashboardContentHeading>
+                Dashboard Content Header
+            </DashboardContentHeading>
+            <DashboardContent>
+              <div>Dashboard Content</div>
+              <div>UserID: {this.state.id}</div>
+              <div>Email: {this.state.email}</div>
+            </DashboardContent>
+          </DashboardContentContainer>
+        </RightPanel>
+      </DashboardContainer>
+    )
+  }
 }
-
-
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -89,9 +69,6 @@ const DashboardContainer = styled.div`
   align-items: stretch;
 `;
 
-
-
-
 const RightPanel = styled.div`
   display: flex;
   flex-direction: column;
@@ -99,11 +76,9 @@ const RightPanel = styled.div`
   align-items: center;
   width: 80vw;
   height: 100vh;
-  
 `;
 
 const DashboardContentContainer = styled.div`
-
   background: #BBBBBB;
 `;
 
@@ -120,7 +95,5 @@ const DashboardContent = styled.div`
    color: #2C3A41;
    margin-bottom: 32px;
 `;
-
-
 
 export default Dashboard;

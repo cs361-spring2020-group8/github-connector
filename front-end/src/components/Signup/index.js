@@ -5,17 +5,10 @@ import { withRouter, Link } from "react-router-dom";
 import Logo from '../../svg/Logo';
 import axios from 'axios';
 
-
-
-
-
 class Signup extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      /*phoneNumber: '',
-      name: '',
-      username: '',*/
       email: '',
       password: '',
 
@@ -42,9 +35,6 @@ class Signup extends React.Component {
         localStorage.setItem('access_token', res.data.token);
         this.props.history.push('/dashboard/');
       }
-
-      console.log(res);
-
 
     } catch (err) {
         console.error(err);
@@ -73,15 +63,12 @@ class Signup extends React.Component {
               Create your account
             </FormHeading>
             <form onSubmit={this.handleFormSubmit}>
-            {/*<FormInput heading="Username" type="text" value={this.state.username} onChange={(event) => this.handleChange("username", event)} />
-            <FormInput heading="Name" type="text" value={this.state.name} onChange={(event) => this.handleChange("name", event)} />
-            <FormInput heading="Phone Number" type="tel" value={this.state.phoneNumber} onChange={(event) => this.handleChange("phoneNumber", event)} />*/}
             <FormInput heading="Email" type="email" value={this.state.email} onChange={(event) => this.handleChange("email", event)} />
             <FormInput heading="Password" type="password" value={this.state.password} onChange={(event) => this.handleChange("password", event)} />
             <SubmitButton type="submit" value="Create account"/>
             </form>
           </FormContainer>
-          <HasAccount>Already have an accout? <Link to="/login">Click HERE</Link> </HasAccount>
+          <SignInText>Already have an account? <Link to="/login">Click HERE</Link> </SignInText>
         </RightPanel>
       </SignupContainer>
     )
@@ -136,7 +123,7 @@ const SubmitButton = styled.input`
   margin-top: 32px;
 `;
 
-const HasAccount = styled.div`
+const SignInText = styled.div`
   font-size: 11px;
   padding: 40px;
 `;
