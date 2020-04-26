@@ -40,18 +40,25 @@ router.post('/login', [
     const query = `SELECT password, id FROM users WHERE email = '${email}'`;
     const dbResults = await getRowFromDb(query);
 
-    // value changes if query worked.
-    const passwordCheck = dbResults.password;
-    const id = dbResults.id;
 
-    // check if user-supplied password matches the hashed password from the db
-    if(await bcrypt.compare(password, passwordCheck)){
-      // if it does, generate and return a jwt
-      const token = createJWT(id);
+    // update: need to check if dbResults returned undefined (i.e. does user exist?)
+    if(typeof dbResults !== 'undefined') {
+      // value changes if query worked.
+      const passwordCheck = dbResults.password;
+      const id = dbResults.id;
 
-      res.status(200).send({ token, id });
+      // check if user-supplied password matches the hashed password from the db
+      if (await bcrypt.compare(password, passwordCheck)) {
+        // if it does, generate and return a jwt
+        const token = createJWT(id);
+
+        res.status(200).send({token, id});
+      } else {
+        res.status(403).send('Login attempt failed.');
+      }
+      // If dbResults return undefined, user not present in DB.
     } else {
-      res.status(403).send('Login attempt failed.');
+      res.status(403).send('User not in database.');
     }
   } catch(err) {
     res.status(500).send(err);
