@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
 import { withRouter, Link } from "react-router-dom";
 import { LeftPanel } from '../../shared/LeftPanel';
 import { RightPanel } from '../../shared/RightPanel';
+import * as SignupApi from '../../api/SignupApi';
 
 class Signup extends React.Component {
   constructor(props) {
@@ -16,25 +16,14 @@ class Signup extends React.Component {
 
   handleFormSubmit = async (event) => {
     event.preventDefault();
-    let payload = {
-      "email": this.state.email,
-      "password": this.state.password
-    };
-
     try {
-      const config = {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-
-      const res = await axios.post('http://localhost:3000/users', payload, config);
+      const { email, password } = this.state
+      const res = await SignupApi.signup(email, password);
       if (res.status === 200) {
         localStorage.removeItem('access_token');
         localStorage.setItem('access_token', res.data.token);
         this.props.history.push('/dashboard');
       }
-
     } catch (err) {
       console.error(err);
     }
