@@ -17,7 +17,13 @@ function App() {
         <Route path="/signup">
           <Signup />
         </Route>
-        <Route path="/dashboard">
+        <Route path="/dashboard" render={() => (
+          isLoggedIn() ? (
+            <Redirect to="/dashboard"/>
+          ) : (
+            <Login />
+          )
+        )}>
           <Dashboard />
         </Route>
         <Route path="/login">
