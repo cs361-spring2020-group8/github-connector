@@ -49,7 +49,7 @@ class Signup extends React.Component {
           buttonText="Create Account"
         >
           <SignInText>
-            Already have an account?<Link to="/login">Click HERE</Link>
+            Already have an account? <Link to="/login">Click HERE</Link>
           </SignInText>
         </RightPanel>
       </SignupContainer>
@@ -63,7 +63,8 @@ const SignupContainer = styled.div`
 
 const SignInText = styled.div`
   font-size: 11px;
-  padding: 40px;
+  text-align: center;
+  padding-top: 32px;
 `;
 
 
