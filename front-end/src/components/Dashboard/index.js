@@ -45,15 +45,6 @@ class Dashboard extends React.Component {
     )
   }
 
-  handleHasGithub = () => {
-    if(this.state.github_info === []){
-      return <div>Welcome {this.state.email}</div>;
-    }
-    else{
-      return <div> Welcome {this.state.github_info.github_username}</div>;
-    }
-  };
-
 
   render() {
     let {hasGH} = this.state.hasLinkedGithub;
