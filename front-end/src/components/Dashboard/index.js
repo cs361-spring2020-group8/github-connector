@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import SideBarNav from "../../shared/SideBarNav";
-import jwt_decode from 'jwt-decode'
+import jwt_decode from 'jwt-decode';
 import axios from "axios";
+import defaultUserImage from '../../svg/githubDefaultUserImage.png';
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -10,7 +11,9 @@ class Dashboard extends React.Component {
     this.state = {
       id: '',
       email: '',
-      isLoaded: false
+      github_info: [],
+      isLoaded: false,
+      hasLinkedGithub: false
     };
   }
 
@@ -42,20 +45,45 @@ class Dashboard extends React.Component {
     )
   }
 
+  handleHasGithub = () => {
+    if(this.state.github_info === []){
+      return <div>Welcome {this.state.email}</div>;
+    }
+    else{
+      return <div> Welcome {this.state.github_info.github_username}</div>;
+    }
+  };
+
+
   render() {
+    let {hasGH} = this.state.hasLinkedGithub;
+    const renderWelcome = () =>{
+      if (!hasGH) {
+        return <div>Welcome {this.state.email}</div>;
+      }
+      else{
+        return <div> Welcome {this.state.github_info.github_username}</div>;
+      }
+
+    }
     return (
       <DashboardContainer>
         <SideBarNav>
         </SideBarNav>
         <RightPanel>
           <DashboardContentContainer>
-            <DashboardContentHeading>
-                Dashboard Content Header
-            </DashboardContentHeading>
-            <DashboardContent>
-              <div>Dashboard Content</div>
-              <div>Email: {this.state.email}</div>
-            </DashboardContent>
+            <DashboardUserProfileImage>
+              <img src={defaultUserImage} alt='defaultUserImage' height='150px' />
+            </DashboardUserProfileImage>
+            <DashboardUserContent>
+              <DashboardContentHeading>
+                {renderWelcome()}
+              </DashboardContentHeading>
+              <DashboardContent>
+                <div>Dashboard Content</div>
+                <div>Email: {this.state.email}</div>
+              </DashboardContent>
+            </DashboardUserContent>
           </DashboardContentContainer>
         </RightPanel>
       </DashboardContainer>
@@ -72,7 +100,7 @@ const DashboardContainer = styled.div`
 
 const RightPanel = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   width: 80vw;
@@ -80,19 +108,32 @@ const RightPanel = styled.div`
 `;
 
 const DashboardContentContainer = styled.div`
+  display:flex;
+  flex-direction: row;
   background: #BBBBBB;
+`;
+
+const DashboardUserProfileImage = styled.div`
+  display:flex;
+  padding: 25px 25px 25px 25px;
+`;
+
+const DashboardUserContent = styled.div`
+  display:flex;
+  flex-direction: column;
+  padding: 25px 25px 25px 25px;
 `;
 
 const DashboardContentHeading = styled.div`
   font-size: 36px;
-  font-weight: 400;
+  font-weight: 400px;
   color: #2C3A41;
   margin-bottom: 32px;
 `;
 
 const DashboardContent = styled.div`
    font-size: 14px;
-   font-weight: 400;
+   font-weight: 400px;
    color: #2C3A41;
    margin-bottom: 32px;
 `;
