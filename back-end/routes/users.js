@@ -1,15 +1,16 @@
 require('dotenv').config();
 
-var express = require('express');
-var router = express.Router();
-
-var bodyParser = require('body-parser');
+const express = require('express');
+const router = express.Router();
 const {check, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
 const { makeDbQueryAndReturnResults, getRowFromDb } = require('../helpers/db-helpers')
-const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage } = require('../helpers/response-helpers')
+const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage, returnNotFound } = require('../helpers/response-helpers')
+const { validateSelfJWT } = require('../middlewares/jwt-validators');
+const GitHubAPI = require('../api/github-api');
+const GitHubInfo = require('../helpers/github-info-helpers');
 
 const PASSWORD_MIN_LENGTH = 8;
 
@@ -110,6 +111,36 @@ VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) returning *`
     } catch(err){
       return returnErrorWithMessage(res, err);
     }
+});
+
+// Attach valid GitHub user profile to user account
+router.put('/:id/github_info', /* validateSelfJWT, */ async (req, res) => {
+  const userId = req.params.id;
+  const username = req.body['github_username'];
+
+  try {
+    const userProfile = await GitHubAPI.getUserProfile(username);
+
+    if (!userProfile) {
+      return returnNotFound('GitHub username does not exist.');
+    }
+
+    const repositories = await GitHubAPI.getUserRepositories(username);
+    // TODO: Find (one of the) top preferred languages
+    const preferredLanguage = 'JavaScript';
+
+    // Insert into DB
+    await GitHubInfo.save(
+      userId,
+      username,userProfile['avatar_url'],
+      preferredLanguage
+    );
+
+    // TODO: Query user and join with github info?
+    return res.sendStatus(200);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 });
 
 /* PUT to update select user information */
