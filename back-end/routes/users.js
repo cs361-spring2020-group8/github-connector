@@ -107,7 +107,7 @@ VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) RETURNING *`
       // generate and return a jwt to include with the db results
       responseBody['token'] = createJWT(dbResults.id);
 
-      return res.status(200).send([responseBody]);
+      return res.status(200).send(responseBody);
 
     } catch(err){
       return returnErrorWithMessage(res, err);
