@@ -20,7 +20,18 @@ async function getRowFromDb(queryString) {
 };
 
 
+async function queryWithParameters(queryString, parameters) {
+  try {
+    const results = await pool.query(queryString, parameters);
+
+    return results.rows[0];
+  } catch (err) {
+    throw err;
+  }
+}
+
 module.exports = {
    makeDbQuery,
    getRowFromDb,
+   queryWithParameters,
 }

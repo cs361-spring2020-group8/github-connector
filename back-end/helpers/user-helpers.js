@@ -1,4 +1,4 @@
-const { makeDbQuery, getRowFromDb} = require('./db-helpers')
+const { makeDbQuery, getRowFromDb, queryWithParameters } = require('./db-helpers')
 
 async function getUserByEmail(email) {
   const query = `SELECT password, id FROM users WHERE email = '${email}'`;
@@ -30,13 +30,21 @@ async function getFullUserProfile(userID) {
 }
 
 async function createUser(email, hashedPassword) {
-  const createUserQuery = `INSERT INTO users(email, password, created_at) \
-VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) RETURNING *`
-  const userData = await getRowFromDb(createUserQuery);
+  const query = 'INSERT INTO users ' +
+    '(email, password, created_at) ' +
+    'VALUES ($1, $2, CURRENT_TIMESTAMP) ' +
+    'RETURNING *';
+
+  const userData = await queryWithParameters(
+    query,
+    [email, hashedPassword]
+  );
+
   return userData;
 }
 
 async function updateUser(userObject, userID) {
+  // TODO: use query parameters in update request
   let queryString = `UPDATE users set `
   for (let [key, value] of Object.entries(userObject)) {
     queryString += `${key} = '${value}' `
