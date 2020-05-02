@@ -8,7 +8,7 @@ const {check, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
-const { makeDbQuery, getRowFromDb, getUserByEmail, getFullUserProfile } = require('../helpers/db-helpers')
+const { getUserByEmail, getFullUserProfile, createUser, updateUser } = require('../helpers/user-helpers')
 const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage } = require('../helpers/response-helpers')
 
 const PASSWORD_MIN_LENGTH = 8;
@@ -92,9 +92,7 @@ router.post('/', [
       const hashedPassword = await bcrypt.hash(password, salt);
 
       // create user in DB
-      const createUserQuery = `INSERT INTO users(email, password, created_at) \
-VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) RETURNING *`
-      dbResults = await getRowFromDb(createUserQuery);
+      dbResults = await createUser(email, hashedPassword);
 
       let responseBody = await getFullUserProfile(dbResults.id);
       if (!responseBody) {
@@ -102,7 +100,7 @@ VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) RETURNING *`
         return res.status(403).send('User not in database.');
       }
 
-      // generate and return a jwt to include with the db results
+      // generate and return a jwt to include with the user representation
       responseBody['token'] = createJWT(dbResults.id);
 
       return res.status(200).send(responseBody);
@@ -136,13 +134,7 @@ router.put('/:id', [
         req.body.password = hashedPassword
       }
 
-      let queryString = `UPDATE users set `
-      for (let [key, value] of Object.entries(req.body)) {
-        queryString += `${key} = '${value}' `
-      }
-      queryString += `where id = ${req.params.id} RETURNING *`
-
-      await makeDbQuery(queryString);
+      await updateUser(req.body, userID);
 
       let responseBody = await getFullUserProfile(userID);
       if (!responseBody) {
