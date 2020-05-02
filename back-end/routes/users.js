@@ -1,15 +1,17 @@
 require('dotenv').config();
 
-var express = require('express');
-var router = express.Router();
-
-var bodyParser = require('body-parser');
-const {check, validationResult} = require('express-validator');
+const express = require('express');
+const router = express.Router();
+const {check, body, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
 const { makeDbQueryAndReturnResults, getRowFromDb } = require('../helpers/db-helpers')
-const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage } = require('../helpers/response-helpers')
+const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage, returnNotFound } = require('../helpers/response-helpers')
+const { validateSelfJWT } = require('../middlewares/jwt-validators');
+const { checkValidation } = require('../middlewares/body-validators');
+const GitHubAPI = require('../api/github-api');
+const GitHubInfo = require('../helpers/github-info-helpers');
 
 const PASSWORD_MIN_LENGTH = 8;
 
@@ -111,6 +113,40 @@ VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) returning *`
       return returnErrorWithMessage(res, err);
     }
 });
+
+// Attach valid GitHub user profile to user account
+router.put(
+  '/:id/github_info',
+  validateSelfJWT,
+  [body('github_username').exists().trim().isLength({ min: 1 })], // Avoiding github_username=''
+  checkValidation,
+  async (req, res) => {
+    const userId = req.params.id;
+    const username = req.body['github_username'];
+
+    try {
+      const userProfile = await GitHubAPI.getUserProfile(username);
+
+      if (!userProfile) {
+        return returnNotFound(res, 'GitHub username does not exist.');
+      }
+
+      const repositories = await GitHubAPI.getUserRepositories(username);
+      const preferredLanguage = GitHubInfo.findPreferredLanguage(repositories);
+
+      const savedGitHubInfo = await GitHubInfo.save(
+        userId,
+        username,
+        userProfile['avatar_url'],
+        preferredLanguage
+      );
+
+      return res.status(200).json(savedGitHubInfo);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  }
+);
 
 /* PUT to update select user information */
 // Allows user to modify select attributes of his or her profile
