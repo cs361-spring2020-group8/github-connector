@@ -96,8 +96,6 @@ router.post('/', [
 VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) RETURNING *`
       dbResults = await getRowFromDb(createUserQuery);
 
-      console.log(dbResults)
-
       let responseBody = await getFullUserProfile(dbResults.id);
       if (!responseBody) {
         // no user data could be found
