@@ -10,7 +10,7 @@ async function getUserByEmail(email) {
 }
 
 async function getUserGitHubInfo(userID) {
-  const userGitHubInfoQuery = 'SELECT * FROM github_info WHERE user_id = $1';
+  const query = 'SELECT * FROM github_info WHERE user_id = $1';
   const userGitHubData = await queryWithParameters(
     query,
     [userID]
@@ -19,7 +19,7 @@ async function getUserGitHubInfo(userID) {
 }
 
 async function getFullUserProfile(userID) {
-  const userQuery = 'SELECT * FROM users WHERE id = $1';
+  const query = 'SELECT * FROM users WHERE id = $1';
   const userData = await queryWithParameters(
     query,
     [userID]
