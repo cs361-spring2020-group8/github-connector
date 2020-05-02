@@ -9,17 +9,6 @@ async function makeDbQuery(queryString) {
   }
 };
 
-async function getRowFromDb(queryString) {
-  let results;
-  try {
-    results = await pool.query(queryString)
-  } catch (e) {
-    throw e
-  }
-  return results.rows[0];
-};
-
-
 async function queryWithParameters(queryString, parameters) {
   try {
     const results = await pool.query(queryString, parameters);
@@ -32,6 +21,5 @@ async function queryWithParameters(queryString, parameters) {
 
 module.exports = {
    makeDbQuery,
-   getRowFromDb,
    queryWithParameters,
 }

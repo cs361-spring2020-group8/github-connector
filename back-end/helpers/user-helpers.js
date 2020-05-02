@@ -1,20 +1,29 @@
-const { makeDbQuery, getRowFromDb, queryWithParameters } = require('./db-helpers')
+const { makeDbQuery, queryWithParameters } = require('./db-helpers')
 
 async function getUserByEmail(email) {
-  const query = `SELECT password, id FROM users WHERE email = '${email}'`;
-  const userData = await getRowFromDb(query);
+  const query = 'SELECT password, id FROM users WHERE email = $1';
+  const userData = await queryWithParameters(
+    query,
+    [email]
+  );
   return userData;
 }
 
 async function getUserGitHubInfo(userID) {
-  const userGitHubInfoQuery = `SELECT * FROM github_info WHERE user_id=${userID}`;
-  const userGitHubData = await getRowFromDb(userGitHubInfoQuery);
+  const userGitHubInfoQuery = 'SELECT * FROM github_info WHERE user_id = $1';
+  const userGitHubData = await queryWithParameters(
+    query,
+    [userID]
+  );
   return userGitHubData;
 }
 
 async function getFullUserProfile(userID) {
-  const userQuery = `SELECT * FROM users WHERE id=${userID}`;
-  const userData = await getRowFromDb(userQuery);
+  const userQuery = 'SELECT * FROM users WHERE id = $1';
+  const userData = await queryWithParameters(
+    query,
+    [userID]
+  );
 
   // exit early if user isn't in the database
   if(!userData) {
