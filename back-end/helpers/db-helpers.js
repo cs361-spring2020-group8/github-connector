@@ -2,16 +2,12 @@
 const { pool } = require('../config');
 const { returnErrorWithMessage, returnGeneralError} = require('./response-helpers');
 
-function makeDbQueryAndReturnResults(queryString, res) {
-  pool.query(queryString, (error, results) => {
-    if (error) {
-      return returnErrorWithMessage(res, error);
-    }
-    else if (!results || !results.rows || results.rows[0] === undefined) {
-      return returnGeneralError(res);
-    }
-    return res.status(200).send(results.rows);
-  })
+async function makeDbQuery(queryString) {
+  try {
+    return await pool.query(queryString)
+  } catch (e) {
+    throw e
+  }
 };
 
 async function getRowFromDb(queryString) {
@@ -24,7 +20,38 @@ async function getRowFromDb(queryString) {
   return results.rows[0];
 };
 
+async function getUserByEmail(email) {
+  const query = `SELECT password, id FROM users WHERE email = '${email}'`;
+  const userData = await getRowFromDb(query);
+  return userData;
+}
+
+async function getUserGitHubInfo(userID) {
+  const userGitHubInfoQuery = `SELECT * FROM github_info WHERE user_id=${userID}`;
+  const userGitHubData = await getRowFromDb(userGitHubInfoQuery);
+  return userGitHubData;
+}
+
+async function getFullUserProfile(userID) {
+  const userQuery = `SELECT * FROM users WHERE id=${userID}`;
+  const userData = await getRowFromDb(userQuery);
+
+  // exit early if user isn't in the database
+  if(!userData) {
+    return null;
+  }
+
+  //omit password from API responses
+  delete userData.password;
+
+  const userGitHubData = await getUserGitHubInfo(userID);
+  userData.github_info = userGitHubData ? userGitHubData : null;
+  return userData;
+};
+
 module.exports = {
-   makeDbQueryAndReturnResults,
+   makeDbQuery,
    getRowFromDb,
+   getUserByEmail,
+   getFullUserProfile,
 }

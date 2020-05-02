@@ -8,13 +8,12 @@ const {check, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
-const { makeDbQueryAndReturnResults, getRowFromDb } = require('../helpers/db-helpers')
+const { makeDbQuery, getRowFromDb, getUserByEmail, getFullUserProfile } = require('../helpers/db-helpers')
 const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage } = require('../helpers/response-helpers')
 
 const PASSWORD_MIN_LENGTH = 8;
 
 // user routes
-
 /* GET user by ID */
 router.get('/:id', async function(req, res, next) {
   // verify user has permission to get this data
@@ -23,8 +22,12 @@ router.get('/:id', async function(req, res, next) {
     return rejectAsUnauthorized(res);
   }
 
-  const getUserQuery = 'SELECT * FROM users WHERE id=' + req.params.id;
-  makeDbQueryAndReturnResults(getUserQuery, res);
+  let responseBody = await getFullUserProfile(userID);
+  if (!responseBody) {
+    // no user data could be found
+    return res.status(403).send('User not in database.');
+  }
+  return res.status(200).send([responseBody]);
 });
 
 // LOGIN for existing users
@@ -36,41 +39,28 @@ router.post('/login', [
   try {
     const { email, password } = req.body;
 
-    // get information about this user from the database
-    const query = `SELECT password, id FROM users WHERE email = '${email}'`;
-    const dbResults = await getRowFromDb(query);
+    const dbResults = await getUserByEmail(email);
 
-
-    // update: need to check if dbResults returned undefined (i.e. does user exist?)
-    if(typeof dbResults !== 'undefined') {
-      // value changes if query worked.
-      const passwordCheck = dbResults.password;
-      const id = dbResults.id;
-
-      // check if user-supplied password matches the hashed password from the db
-      if (await bcrypt.compare(password, passwordCheck)) {
-        // if it does, generate and return a jwt
-        const token = createJWT(id);
-
-        res.status(200).send({token, id});
-      } else {
-        res.status(403).send('Login attempt failed.');
-      }
+    if(!dbResults){
       // If dbResults return undefined, user not present in DB.
+      return res.status(403).send('User not in database.');
+    }
+
+    const passwordCheck = dbResults.password;
+    const id = dbResults.id;
+
+    // check if user-supplied password matches the hashed password from the db
+    if (await bcrypt.compare(password, passwordCheck)) {
+      // if it does, generate and return a jwt
+      const token = createJWT(id);
+
+      res.status(200).send({token, id});
     } else {
-      res.status(403).send('User not in database.');
+      res.status(403).send('Login attempt failed.');
     }
   } catch(err) {
     res.status(500).send(err);
   }
-});
-
-// TODO: route for when logged in, what do we want to call this?
-// just using login/success as a placeholder for now,
-// can change if we want
-router.get('/login/success', function(req, res, next){
-  const id = getUserIdFromToken(req);
-
 });
 
 /* POST to create new users */
@@ -91,21 +81,33 @@ router.post('/', [
       // get email password from request body
       const { email, password } = req.body;
 
+      // check if email is already in use
+      let dbResults = await getUserByEmail(email);
+      if(dbResults) {
+        return res.status(400).send('Email address is already in use.');
+      }
+
       // salt and hash password
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(password, salt);
 
       // create user in DB
       const createUserQuery = `INSERT INTO users(email, password, created_at) \
-VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) returning *`
+VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) RETURNING *`
+      dbResults = await getRowFromDb(createUserQuery);
 
-      let dbResults = await getRowFromDb(createUserQuery);
+      console.log(dbResults)
 
-      // generate and return a jwt to inclue with the db results
-      const token = createJWT(dbResults.id);
-      dbResults['token'] = token;
+      let responseBody = await getFullUserProfile(dbResults.id);
+      if (!responseBody) {
+        // no user data could be found
+        return res.status(403).send('User not in database.');
+      }
 
-      return res.status(200).send(dbResults);
+      // generate and return a jwt to include with the db results
+      responseBody['token'] = createJWT(dbResults.id);
+
+      return res.status(200).send([responseBody]);
 
     } catch(err){
       return returnErrorWithMessage(res, err);
@@ -117,7 +119,6 @@ VALUES('${email}', '${hashedPassword}', CURRENT_TIMESTAMP) returning *`
 router.put('/:id', [
     check('email').optional().isEmail().normalizeEmail(),
     check('twitter').optional().trim().escape(),
-    check('github_username').optional().trim(),
     check('phone').optional().trim(),
   ], async function(req, res, next) {
 
@@ -143,7 +144,15 @@ router.put('/:id', [
       }
       queryString += `where id = ${req.params.id} RETURNING *`
 
-      makeDbQueryAndReturnResults(queryString, res);
+      await makeDbQuery(queryString);
+
+      let responseBody = await getFullUserProfile(userID);
+      if (!responseBody) {
+        // no user data could be found
+        return res.status(403).send('User not in database.');
+      }
+      res.status(200).send([responseBody]);
+
     } catch(err){
       res.status(500).send(err);
     }
