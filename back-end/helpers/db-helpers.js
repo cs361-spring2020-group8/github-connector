@@ -1,33 +1,18 @@
 // helper functions to query db and return standardized API responses
 const { pool } = require('../config');
-const { returnErrorWithMessage, returnGeneralError} = require('./response-helpers');
 
-function makeDbQueryAndReturnResults(queryString, res) {
-  pool.query(queryString, (error, results) => {
-    if (error) {
-      return returnErrorWithMessage(res, error);
-    }
-    else if (!results || !results.rows || results.rows[0] === undefined) {
-      return returnGeneralError(res);
-    }
-    return res.status(200).send(results.rows);
-  })
-};
-
-async function getRowFromDb(queryString) {
-  let results;
+async function makeDbQuery(queryString) {
   try {
-    results = await pool.query(queryString)
+    return await pool.query(queryString)
   } catch (e) {
     throw e
   }
-  return results.rows[0];
 };
 
 async function queryWithParameters(queryString, parameters) {
   try {
     const results = await pool.query(queryString, parameters);
-    
+
     return results.rows[0];
   } catch (err) {
     throw err;
@@ -35,7 +20,6 @@ async function queryWithParameters(queryString, parameters) {
 }
 
 module.exports = {
-   makeDbQueryAndReturnResults,
-   getRowFromDb,
+   makeDbQuery,
    queryWithParameters,
 }
