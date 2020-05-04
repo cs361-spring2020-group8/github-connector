@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import SideBarNav from '../../shared/SideBarNav';
 import jwt_decode from 'jwt-decode'
-import defaultUserImage from '../../svg/githubDefaultUserImage.png';
 import * as DashboardApi from '../../api/DashboardApi';
+import FormInput from "../../shared/FormInput";
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -70,6 +70,27 @@ class Dashboard extends React.Component {
       return null;
     }
   }
+  renderDashboardContent = () => {
+    let github_language = 'None Listed';
+    if (this.state.github_info.language === null){
+      github_language = 'None Listed';
+    } else {
+      github_language = this.state.github_info.language;
+    }
+    if(this.hasGH()) {
+      return <React.Fragment>
+      <div>Profile Information:</div>
+      <div>Email: {this.state.email}</div>
+        <div>Github Page: <a href={"https://github.com/"+this.state.github_info.github_username}>{this.state.github_info.github_username}</a> </div>
+      <div>Github Language: {github_language}</div>
+      </React.Fragment>;
+    } else {
+        return <React.Fragment>
+        <div>Profile Information:</div>
+        <div>Email: {this.state.email}</div>
+        </React.Fragment>;
+    }
+  }
 
 
   render() {
@@ -87,13 +108,17 @@ class Dashboard extends React.Component {
                 {this.renderWelcome()}
               </DashboardContentHeading>
               <DashboardContent>
-                <div>Dashboard Content</div>
-                <div>Email: {this.state.email}</div>
-                <div>Twitter: {this.state.twitter}</div>
-                <div>GH Language: {this.state.github_info.language}</div>
+                {this.renderDashboardContent()}
               </DashboardContent>
             </DashboardUserContent>
           </DashboardContentContainer>
+          <AddProfileInfoContainer >
+            <div>Add Profile Information</div>
+            <FormInput heading="Github Username" type="text" value={this.state.github_info.github_username} onChange={(event) => this.state.onChange("github", event)} />
+            <FormInput heading="twitter" type="text" value={this.state.twitter} onChange={(event) => this.state.onChange("password", event)} />
+            <FormInput heading="phone" type="phone" value={this.state.phone} onChange={(event) => this.state.onChange("password", event)} />
+            <SubmitButton type="submit" value={this.state.buttonText} />
+          </AddProfileInfoContainer>
         </RightPanel>
       </DashboardContainer>
     )
@@ -109,7 +134,7 @@ const DashboardContainer = styled.div`
 
 const RightPanel = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 80vw;
@@ -129,10 +154,11 @@ const DashboardUserProfileImage = styled.div`
   padding: 25px 25px 25px 25px;
 `;
 
-const DashboardUserContent = styled.div`
-  display:flex;
-  flex-direction: column;
-  padding: 25px 25px 25px 25px;
+const DashboardContent = styled.div`
+   font-size: 16px;
+   font-weight: 400;
+   color: #2C3A41;
+   margin-bottom: 32px;
 `;
 
 const DashboardContentHeading = styled.div`
@@ -142,11 +168,28 @@ const DashboardContentHeading = styled.div`
   margin-bottom: 32px;
 `;
 
-const DashboardContent = styled.div`
-   font-size: 14px;
-   font-weight: 400;
-   color: #2C3A41;
-   margin-bottom: 32px;
+const DashboardUserContent = styled.div`
+  display:flex;
+  flex-direction: column;
+  padding: 25px 25px 25px 25px;
+`;
+
+const AddProfileInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-top: 30px;
+`;
+
+const SubmitButton = styled.input`
+  cursor: pointer;
+  border: none;
+  color: #FFFFFF;
+  background: #7F337E;
+  height: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  margin-top: 12px;
 `;
 
 export default Dashboard;
