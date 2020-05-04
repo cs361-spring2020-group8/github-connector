@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import SideBarNav from '../../shared/SideBarNav';
 import jwt_decode from 'jwt-decode'
+import defaultUserImage from '../../svg/githubDefaultUserImage.png';
 import * as DashboardApi from '../../api/DashboardApi';
 
 class Dashboard extends React.Component {
@@ -10,8 +11,10 @@ class Dashboard extends React.Component {
     this.state = {
       id: '',
       email: '',
+      phone: '',
+      twitter: '',
+      github_info: {},
       isLoaded: false,
-      hasLinkedGithub: false,
       hasAuthError: false,
       hasServerError: false
     };
@@ -26,11 +29,14 @@ class Dashboard extends React.Component {
       try {
         const res = await DashboardApi.pullUserInfo(userID, token);
         if (res.status === 200) {
-          this.setState({
-            isLoaded: true,
-            id: res.data[0].id,
-            email: res.data[0].email,
-          });
+            this.setState({
+              isLoaded: true,
+              id: res.data[0].id,
+              email: res.data[0].email,
+              twitter: res.data[0].twitter,
+              phone: res.data[0].phone,
+              github_info: res.data[0].github_info
+            });
         }
       } catch (e) {
         const {response: {status}} = e
@@ -43,19 +49,30 @@ class Dashboard extends React.Component {
     });
   }
 
+  hasGH = () =>{
+    if (this.state.github_info === null){
+      return false;
+    } else {
+      return true;
+    }
+  }
+  renderWelcome = () =>{
+    if (this.hasGH) {
+      return <div> Welcome {this.state.github_info.github_username}</div>;
+    } else{
+      return <div>Welcome {this.state.email}</div>;
+    }
+  }
+  renderGHImage = () => {
+    if(this.hasGH()){
+      return <img src={this.state.github_info.profile_image_url} alt='userGHImage' height='150px'/>;
+    } else {
+      return null;
+    }
+  }
 
 
   render() {
-    let {hasGH} = this.state.hasLinkedGithub;
-    const renderWelcome = () =>{
-      if (!hasGH) {
-        return <div>Welcome {this.state.email}</div>;
-      }
-      else{
-        return <div> Welcome {this.state.github_info.github_username}</div>;
-      }
-
-    }
     return (
       <DashboardContainer>
         <SideBarNav>
@@ -63,15 +80,17 @@ class Dashboard extends React.Component {
         <RightPanel>
           <DashboardContentContainer>
             <DashboardUserProfileImage>
-              <img src={defaultUserImage} alt='defaultUserImage' height='150px' />
+              {this.renderGHImage()}
             </DashboardUserProfileImage>
             <DashboardUserContent>
               <DashboardContentHeading>
-                {renderWelcome()}
+                {this.renderWelcome()}
               </DashboardContentHeading>
               <DashboardContent>
                 <div>Dashboard Content</div>
                 <div>Email: {this.state.email}</div>
+                <div>Twitter: {this.state.twitter}</div>
+                <div>GH Language: {this.state.github_info.language}</div>
               </DashboardContent>
             </DashboardUserContent>
           </DashboardContentContainer>
@@ -101,6 +120,8 @@ const DashboardContentContainer = styled.div`
   display:flex;
   flex-direction: row;
   background: #BBBBBB;
+  border-radius: 10px;
+  overflow: hidden;
 `;
 
 const DashboardUserProfileImage = styled.div`
