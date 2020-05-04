@@ -15,7 +15,11 @@ function App() {
     <Router>
       <Switch>
         <Route path="/signup" render={() => (
-          <Signup/>
+          isLoggedIn() ? (
+            <Dashboard />
+          ) : (
+            <Signup/>
+          )
         )}>
         </Route>
         <Route path="/dashboard" render={() => (
