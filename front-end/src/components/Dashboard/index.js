@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import SideBarNav from '../../shared/SideBarNav';
 import jwt_decode from 'jwt-decode'
 import * as DashboardApi from '../../api/DashboardApi';
-import FormInput from "../../shared/FormInput";
+
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -13,7 +13,7 @@ class Dashboard extends React.Component {
       email: '',
       phone: '',
       twitter: '',
-      github_info: {},
+      github_info: null,
       isLoaded: false,
       hasAuthError: false,
       hasServerError: false
@@ -49,6 +49,7 @@ class Dashboard extends React.Component {
     });
   }
 
+
   hasGH = () =>{
     if (this.state.github_info === null){
       return false;
@@ -57,41 +58,63 @@ class Dashboard extends React.Component {
     }
   }
   renderWelcome = () =>{
-    if (this.hasGH) {
+    if (this.hasGH()) {
       return <div> Welcome {this.state.github_info.github_username}</div>;
     } else{
       return <div>Welcome {this.state.email}</div>;
     }
   }
-  renderGHImage = () => {
+  renderGitHubImage = () => {
     if(this.hasGH()){
       return <img src={this.state.github_info.profile_image_url} alt='userGHImage' height='150px'/>;
     } else {
       return null;
     }
   }
-  renderDashboardContent = () => {
+  renderPhone = () => {
+    if (this.state.phone !== null){
+      return <div>Phone: {this.state.phone}</div>;
+    }
+  }
+  renderTwitter = () => {
+    if (this.state.twitter !== null){
+      return <div>Twitter: {this.state.twitter}</div>;
+    }
+  }
+  renderLanguage = () => {
     let github_language = 'None Listed';
     if (this.state.github_info.language === null){
       github_language = 'None Listed';
     } else {
       github_language = this.state.github_info.language;
     }
+    return <div>Github Language: {github_language}</div>;
+  }
+
+
+  renderDashboardContent = () => {
+
     if(this.hasGH()) {
       return <React.Fragment>
       <div>Profile Information:</div>
+        <br/>
       <div>Email: {this.state.email}</div>
-        <div>Github Page: <a href={"https://github.com/"+this.state.github_info.github_username}>{this.state.github_info.github_username}</a> </div>
-      <div>Github Language: {github_language}</div>
+        {this.renderPhone()}
+        {this.renderTwitter()}
+      <div>Github Page: <a href={"https://github.com/"+this.state.github_info.github_username}>{this.state.github_info.github_username}</a> </div>
+        {this.renderLanguage()}
       </React.Fragment>;
-    } else {
-        return <React.Fragment>
-        <div>Profile Information:</div>
-        <div>Email: {this.state.email}</div>
-        </React.Fragment>;
+    }
+    else {
+      return <React.Fragment>
+      <div>Profile Information:</div>
+        <br/>
+      <div>Email: {this.state.email}</div>
+      {this.renderPhone()}
+      {this.renderTwitter()}
+      </React.Fragment>;
     }
   }
-
 
   render() {
     return (
@@ -101,7 +124,7 @@ class Dashboard extends React.Component {
         <RightPanel>
           <DashboardContentContainer>
             <DashboardUserProfileImage>
-              {this.renderGHImage()}
+              {this.renderGitHubImage()}
             </DashboardUserProfileImage>
             <DashboardUserContent>
               <DashboardContentHeading>
@@ -113,11 +136,10 @@ class Dashboard extends React.Component {
             </DashboardUserContent>
           </DashboardContentContainer>
           <AddProfileInfoContainer >
-            <div>Add Profile Information</div>
-            <FormInput heading="Github Username" type="text" value={this.state.github_info.github_username} onChange={(event) => this.state.onChange("github", event)} />
-            <FormInput heading="twitter" type="text" value={this.state.twitter} onChange={(event) => this.state.onChange("password", event)} />
-            <FormInput heading="phone" type="phone" value={this.state.phone} onChange={(event) => this.state.onChange("password", event)} />
-            <SubmitButton type="submit" value={this.state.buttonText} />
+            <AddProfileInforHeader>
+            </AddProfileInforHeader>
+            <AddProfileInfoForm >
+            </AddProfileInfoForm>
           </AddProfileInfoContainer>
         </RightPanel>
       </DashboardContainer>
@@ -144,7 +166,7 @@ const RightPanel = styled.div`
 const DashboardContentContainer = styled.div`
   display:flex;
   flex-direction: row;
-  background: #BBBBBB;
+  background: #e5e5e5;
   border-radius: 10px;
   overflow: hidden;
 `;
@@ -180,16 +202,16 @@ const AddProfileInfoContainer = styled.div`
   padding-top: 30px;
 `;
 
-const SubmitButton = styled.input`
-  cursor: pointer;
-  border: none;
-  color: #FFFFFF;
-  background: #7F337E;
-  height: 40px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 4px;
-  margin-top: 12px;
+const AddProfileInforHeader = styled.div`
+  display: flex;
+  font-size: 24px;
+  padding-bottom: 10px;
 `;
+
+const AddProfileInfoForm = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
+
 
 export default Dashboard;
