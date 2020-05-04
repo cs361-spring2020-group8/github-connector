@@ -28,9 +28,14 @@ Type `npm run start:dev` to start the server locally on port 3000.
 * https://www.postgresql.org/docs/current/app-psql.html
 * https://www.postgresqltutorial.com/postgresql-create-table/
 
-psql show databases: `\d`
-psql use database: `\c dbname`
-psql show tables: `\dt`
+psql show databases:
+`\d`
+
+psql use database:
+`\c dbname`
+
+psql show tables:
+`\dt`
 
 Change a db column type:
 ```
@@ -41,3 +46,6 @@ Find out information about a table:
 ```
 \d table_name
 ```
+
+Remove your local copy of the heroku database + make a fresh copy from heroku:
+`dropdb mydb` && `heroku pg:pull <databasename> mydb --app githubconnector`

@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import SideBarNav from "../../shared/SideBarNav";
-import jwt_decode from 'jwt-decode';
-import axios from "axios";
-import defaultUserImage from '../../svg/githubDefaultUserImage.png';
+import SideBarNav from '../../shared/SideBarNav';
+import jwt_decode from 'jwt-decode'
+import * as DashboardApi from '../../api/DashboardApi';
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -11,9 +10,10 @@ class Dashboard extends React.Component {
     this.state = {
       id: '',
       email: '',
-      github_info: [],
       isLoaded: false,
-      hasLinkedGithub: false
+      hasLinkedGithub: false,
+      hasAuthError: false,
+      hasServerError: false
     };
   }
 
@@ -22,28 +22,27 @@ class Dashboard extends React.Component {
     let decoded = jwt_decode(token);
     let userID = decoded.id;
 
-    // TODO: Move API code to its own file under api folder
-    const url = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://githubconnector.herokuapp.com';
-    axios.get(`${url}/users/${userID}`,{ headers:{
-      'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer '  + token }
-    }).then(
-      (result) => {
-        this.setState({
-          isLoaded: true,
-          id: result.data[0].id,
-          email: result.data[0].email,
-        });
-      },
-      (error) => {
-        this.setState({
-          isLoaded: true,
-          error
-        });
+    this.setState({hasAuthError: false, hasServerError: false}, async () => {
+      try {
+        const res = await DashboardApi.pullUserInfo(userID, token);
+        if (res.status === 200) {
+          this.setState({
+            isLoaded: true,
+            id: res.data[0].id,
+            email: res.data[0].email,
+          });
+        }
+      } catch (e) {
+        const {response: {status}} = e
+        if (status >= 400 && status < 500) {
+          this.setState({hasAuthError: true});
+        } else {
+          this.setState({hasServerError: true});
+        }
       }
-    )
+    });
   }
+
 
 
   render() {
@@ -117,14 +116,14 @@ const DashboardUserContent = styled.div`
 
 const DashboardContentHeading = styled.div`
   font-size: 36px;
-  font-weight: 400px;
+  font-weight: 400;
   color: #2C3A41;
   margin-bottom: 32px;
 `;
 
 const DashboardContent = styled.div`
    font-size: 14px;
-   font-weight: 400px;
+   font-weight: 400;
    color: #2C3A41;
    margin-bottom: 32px;
 `;
