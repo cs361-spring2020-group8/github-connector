@@ -38,8 +38,8 @@ class EditProfile extends React.Component {
             isLoaded: true,
             id: res.data[0].id,
             email: res.data[0].email,
-            twitter: res.data[0].twitter,
-            phone: res.data[0].phone,
+            twitter: res.data[0].twitter || '',
+            phone: res.data[0].phone || '',
             github_info: res.data[0].github_info
           });
         }
