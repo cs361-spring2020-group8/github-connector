@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import SideBarNav from '../../shared/SideBarNav';
 import jwt_decode from 'jwt-decode'
 import * as DashboardApi from '../../api/DashboardApi';
+import { Link } from "react-router-dom";
 
 
 class Dashboard extends React.Component {
@@ -106,8 +107,12 @@ class Dashboard extends React.Component {
               <DashboardContent>
                 {this.renderDashboardContent()}
               </DashboardContent>
+              <EditProfileLinkContainer>
+               <Link to='/editprofile'>Click Here To Edit Profile</Link>
+              </EditProfileLinkContainer>
             </DashboardUserContent>
           </DashboardContentContainer>
+
         </RightPanel>
       </DashboardContainer>
     )
@@ -161,6 +166,11 @@ const DashboardUserContent = styled.div`
   display:flex;
   flex-direction: column;
   padding: 25px 25px 25px 25px;
+`;
+
+const EditProfileLinkContainer =styled.div`
+  display: flex;
+  font-size: 12px;
 `;
 
 export default Dashboard;

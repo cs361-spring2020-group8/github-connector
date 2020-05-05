@@ -4,7 +4,8 @@ import SideBarNav from '../../shared/SideBarNav';
 import jwt_decode from 'jwt-decode'
 import * as DashboardApi from '../../api/DashboardApi';
 import FormInput from "../../shared/FormInput";
-import { withRouter, Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
+
 
 
 class EditProfile extends React.Component {
@@ -15,6 +16,7 @@ class EditProfile extends React.Component {
       email: '',
       phone: '',
       twitter: '',
+      github_username:'',
       github_info: null,
       isLoaded: false,
       hasAuthError: false,
@@ -58,6 +60,34 @@ class EditProfile extends React.Component {
     })
   }
 
+  handleGithubProfileFormSubmit = async (event) =>{
+    event.preventDefault();
+    let token = localStorage.getItem('access_token');
+    let decoded = jwt_decode(token);
+    let userID = decoded.id;
+
+    this.setState({hasAuthError: false, hasServerError: false}, async () => {
+      try {
+        const res = await DashboardApi.linkGithubAccount(userID, token, this.state.github_username);
+        if (res.status === 200) {
+          this.props.history.push('/dashboard');
+        }
+      } catch (e) {
+
+        const {response: {status}} = e
+        if ( status === 404) {
+          this.setState({hasGithubProfileNotFoundError: true});
+        }
+        else if (status >= 405 && status < 500) {
+          this.setState({hasAuthError: true});
+        } else {
+          this.setState({hasServerError: true});
+        }
+      }
+    });
+  }
+
+
   handleEmailFormSubmit = async (event) =>{
     event.preventDefault();
     let token = localStorage.getItem('access_token');
@@ -67,12 +97,10 @@ class EditProfile extends React.Component {
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
         const res = await DashboardApi.updateEmailInformation(userID, token, this.state.email);
-        console.log(res.status);
         if (res.status === 200) {
           this.props.history.push('/dashboard');
         }
       } catch (e) {
-        console.log(e);
         const {response: {status}} = e
         if (status >= 400 && status < 500) {
           this.setState({hasAuthError: true});
@@ -91,12 +119,10 @@ class EditProfile extends React.Component {
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
         const res = await DashboardApi.updateTwitterInformation(userID, token, this.state.twitter);
-        console.log(res.status);
         if (res.status === 200) {
           this.props.history.push('/dashboard');
         }
       } catch (e) {
-        console.log(e);
         const {response: {status}} = e
         if (status >= 400 && status < 500) {
           this.setState({hasAuthError: true});
@@ -115,12 +141,11 @@ class EditProfile extends React.Component {
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
         const res = await DashboardApi.updatePhoneInformation(userID, token, this.state.phone);
-        console.log(res.status);
+
         if (res.status === 200) {
           this.props.history.push('/dashboard');
         }
       } catch (e) {
-        console.log(e);
         const {response: {status}} = e
         if (status >= 400 && status < 500) {
           this.setState({hasAuthError: true});
@@ -139,18 +164,22 @@ class EditProfile extends React.Component {
         <RightPanel>
           <DashboardContentContainer>
             <DashboardUserContent>
-              <DashboardContentHeading>
-                Attach Github Account
-              </DashboardContentHeading>
-              <DashboardContent>
-                <FormContainer onSubmit={this.handleFormSubmit}>
-                  <FormInput heading="Github Username" type="text" value={this.state.email} onChange={(event) => this.handleChange("username", event) }/>
-                  <SubmitButton type="submit" value="Attach Account"/>
-                  <ErrorText>
-                    { this.state.hasGithubProfileNotFoundError && "No Github profile with that username found. Please try again." }
-                  </ErrorText>
-                </FormContainer>
-              </DashboardContent>
+              {!this.state.github_info &&
+                <React.Fragment>
+                <DashboardContentHeading>
+                  Attach Github Account
+                </DashboardContentHeading>
+                <DashboardContent>
+                  <FormContainer onSubmit={this.handleGithubProfileFormSubmit}>
+                    <FormInput heading="Github Username" type="text" value={this.state.github_username} onChange={(event) => this.handleChange("github_username", event) }/>
+                    <SubmitButton type="submit" value="Attach Account"/>
+                    <ErrorText>
+                      { this.state.hasGithubProfileNotFoundError && "No Github profile with that username found. Please try again." }
+                    </ErrorText>
+                  </FormContainer>
+                </DashboardContent>
+                </React.Fragment>
+              }
               <DashboardContentHeading>
                 Edit Profile...
               </DashboardContentHeading>
@@ -168,6 +197,9 @@ class EditProfile extends React.Component {
                   <SubmitButton type="submit" value="Update Phone"/>
                 </FormContainer>
               </DashboardContent>
+              <ReturnToDashboard>
+                <Link to='/dashboard'>Return To Dashboard</Link>
+              </ReturnToDashboard>
             </DashboardUserContent>
           </DashboardContentContainer>
         </RightPanel>
@@ -242,6 +274,12 @@ const ErrorText = styled.div`
   margin-top: 16px;
   text-align: center;
   min-height: 24px;
+`;
+
+const ReturnToDashboard = styled.div`
+  display: flex;
+  font-size: 12px;
+  justify-content: center;
 `;
 
 export default withRouter(EditProfile);
