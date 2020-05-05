@@ -4,12 +4,16 @@ import SideBarNav from '../../shared/SideBarNav';
 import jwt_decode from 'jwt-decode'
 import * as DashboardApi from '../../api/DashboardApi';
 
+
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       id: '',
       email: '',
+      phone: '',
+      twitter: '',
+      github_info: null,
       isLoaded: false,
       hasAuthError: false,
       hasServerError: false
@@ -25,11 +29,14 @@ class Dashboard extends React.Component {
       try {
         const res = await DashboardApi.pullUserInfo(userID, token);
         if (res.status === 200) {
-          this.setState({
-            isLoaded: true,
-            id: res.data[0].id,
-            email: res.data[0].email,
-          });
+            this.setState({
+              isLoaded: true,
+              id: res.data[0].id,
+              email: res.data[0].email,
+              twitter: res.data[0].twitter,
+              phone: res.data[0].phone,
+              github_info: res.data[0].github_info
+            });
         }
       } catch (e) {
         const {response: {status}} = e
@@ -43,6 +50,48 @@ class Dashboard extends React.Component {
   }
 
 
+  hasGithubInfo = () =>{
+    return this.state.github_info !== null;
+  }
+  renderWelcome = () =>{
+    const welcomeName = this.hasGithubInfo() ? this.state.github_info.github_username : this.state.email;
+    return <div>Welcome {welcomeName}</div>
+  /*  if (this.hasGithubInfo()) {
+      return <div> Welcome {this.state.github_info.github_username}</div>;
+    } else{
+      return <div>Welcome {this.state.email}</div>;
+    }*/
+  }
+  renderGitHubImage = () => {
+    if(this.hasGithubInfo()){
+      return <img src={this.state.github_info.profile_image_url} alt='userGHImage' height='150px'/>;
+    } else {
+      return null;
+    }
+  }
+  renderLanguage = () => {
+    const github_language = this.state.github_info.language || 'None Listed';
+    return <div>Github Language: {github_language}</div>;
+  }
+
+
+  renderDashboardContent = () => {
+      return <React.Fragment>
+        <div>Profile Information:</div>
+        <br/>
+        <div>Email: {this.state.email}</div>
+        {!!this.state.phone && <div>Phone: {this.state.phone}</div>}
+        {!!this.state.twitter && <div>Twitter: {this.state.twitter}</div>}
+        {this.hasGithubInfo() &&
+          <React.Fragment>
+            <div>Github Page: <a href={"https://github.com/" + this.state.github_info.github_username}>
+              {this.state.github_info.github_username}</a></div>
+            {this.renderLanguage()}
+          </React.Fragment>
+        }
+      </React.Fragment>;
+  }
+
   render() {
     return (
       <DashboardContainer>
@@ -50,13 +99,17 @@ class Dashboard extends React.Component {
         </SideBarNav>
         <RightPanel>
           <DashboardContentContainer>
-            <DashboardContentHeading>
-                Dashboard Content Header
-            </DashboardContentHeading>
-            <DashboardContent>
-              <div>Dashboard Content</div>
-              <div>Email: {this.state.email}</div>
-            </DashboardContent>
+            <DashboardUserProfileImage>
+              {this.renderGitHubImage()}
+            </DashboardUserProfileImage>
+            <DashboardUserContent>
+              <DashboardContentHeading>
+                {this.renderWelcome()}
+              </DashboardContentHeading>
+              <DashboardContent>
+                {this.renderDashboardContent()}
+              </DashboardContent>
+            </DashboardUserContent>
           </DashboardContentContainer>
         </RightPanel>
       </DashboardContainer>
@@ -81,7 +134,23 @@ const RightPanel = styled.div`
 `;
 
 const DashboardContentContainer = styled.div`
-  background: #BBBBBB;
+  display:flex;
+  flex-direction: row;
+  background: #e5e5e5;
+  border-radius: 10px;
+  overflow: hidden;
+`;
+
+const DashboardUserProfileImage = styled.div`
+  display:flex;
+  padding: 25px 25px 25px 25px;
+`;
+
+const DashboardContent = styled.div`
+   font-size: 16px;
+   font-weight: 400;
+   color: #2C3A41;
+   margin-bottom: 32px;
 `;
 
 const DashboardContentHeading = styled.div`
@@ -91,11 +160,10 @@ const DashboardContentHeading = styled.div`
   margin-bottom: 32px;
 `;
 
-const DashboardContent = styled.div`
-   font-size: 14px;
-   font-weight: 400;
-   color: #2C3A41;
-   margin-bottom: 32px;
+const DashboardUserContent = styled.div`
+  display:flex;
+  flex-direction: column;
+  padding: 25px 25px 25px 25px;
 `;
 
 export default Dashboard;

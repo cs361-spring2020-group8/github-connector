@@ -18,7 +18,7 @@ function App() {
           isLoggedIn() ? (
             <Dashboard />
           ) : (
-            <Signup />
+            <Signup/>
           )
         )}>
         </Route>
