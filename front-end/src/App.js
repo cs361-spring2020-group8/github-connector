@@ -8,6 +8,7 @@ import {
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
+import EditProfile from "./components/EditProfile";
 import { isLoggedIn } from './helpers/auth';
 
 function App() {
@@ -32,6 +33,14 @@ function App() {
         </Route>
         <Route path="/login">
           <Login />
+        </Route>
+        <Route path="/editprofile" render={() => (
+          isLoggedIn() ? (
+            <EditProfile />
+          ) : (
+            <Login />
+          )
+        )}>
         </Route>
         <Route exact path="/" render={() => (
           isLoggedIn() ? (
