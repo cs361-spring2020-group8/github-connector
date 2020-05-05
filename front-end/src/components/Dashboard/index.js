@@ -53,15 +53,12 @@ class Dashboard extends React.Component {
   hasGithubInfo = () =>{
     return this.state.github_info !== null;
   }
+
   renderWelcome = () =>{
     const welcomeName = this.hasGithubInfo() ? this.state.github_info.github_username : this.state.email;
     return <div>Welcome {welcomeName}</div>
-  /*  if (this.hasGithubInfo()) {
-      return <div> Welcome {this.state.github_info.github_username}</div>;
-    } else{
-      return <div>Welcome {this.state.email}</div>;
-    }*/
   }
+
   renderGitHubImage = () => {
     if(this.hasGithubInfo()){
       return <img src={this.state.github_info.profile_image_url} alt='userGHImage' height='150px'/>;
@@ -69,11 +66,11 @@ class Dashboard extends React.Component {
       return null;
     }
   }
+
   renderLanguage = () => {
     const github_language = this.state.github_info.language || 'None Listed';
     return <div>Github Language: {github_language}</div>;
   }
-
 
   renderDashboardContent = () => {
       return <React.Fragment>
