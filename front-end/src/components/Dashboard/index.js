@@ -50,70 +50,46 @@ class Dashboard extends React.Component {
   }
 
 
-  hasGH = () =>{
-    if (this.state.github_info === null){
-      return false;
-    } else {
-      return true;
-    }
+  hasGithubInfo = () =>{
+    return this.state.github_info !== null;
   }
   renderWelcome = () =>{
-    if (this.hasGH()) {
+    const welcomeName = this.hasGithubInfo() ? this.state.github_info.github_username : this.state.email;
+    return <div>Welcome {welcomeName}</div>
+  /*  if (this.hasGithubInfo()) {
       return <div> Welcome {this.state.github_info.github_username}</div>;
     } else{
       return <div>Welcome {this.state.email}</div>;
-    }
+    }*/
   }
   renderGitHubImage = () => {
-    if(this.hasGH()){
+    if(this.hasGithubInfo()){
       return <img src={this.state.github_info.profile_image_url} alt='userGHImage' height='150px'/>;
     } else {
       return null;
     }
   }
-  renderPhone = () => {
-    if (this.state.phone !== null){
-      return <div>Phone: {this.state.phone}</div>;
-    }
-  }
-  renderTwitter = () => {
-    if (this.state.twitter !== null){
-      return <div>Twitter: {this.state.twitter}</div>;
-    }
-  }
   renderLanguage = () => {
-    let github_language = 'None Listed';
-    if (this.state.github_info.language === null){
-      github_language = 'None Listed';
-    } else {
-      github_language = this.state.github_info.language;
-    }
+    const github_language = this.state.github_info.language || 'None Listed';
     return <div>Github Language: {github_language}</div>;
   }
 
 
   renderDashboardContent = () => {
-
-    if(this.hasGH()) {
       return <React.Fragment>
-      <div>Profile Information:</div>
+        <div>Profile Information:</div>
         <br/>
-      <div>Email: {this.state.email}</div>
-        {this.renderPhone()}
-        {this.renderTwitter()}
-      <div>Github Page: <a href={"https://github.com/"+this.state.github_info.github_username}>{this.state.github_info.github_username}</a> </div>
-        {this.renderLanguage()}
+        <div>Email: {this.state.email}</div>
+        {!!this.state.phone && <div>Phone: {this.state.phone}</div>}
+        {!!this.state.twitter && <div>Twitter: {this.state.twitter}</div>}
+        {this.hasGithubInfo() &&
+          <React.Fragment>
+            <div>Github Page: <a href={"https://github.com/" + this.state.github_info.github_username}>
+              {this.state.github_info.github_username}</a></div>
+            {this.renderLanguage()}
+          </React.Fragment>
+        }
       </React.Fragment>;
-    }
-    else {
-      return <React.Fragment>
-      <div>Profile Information:</div>
-        <br/>
-      <div>Email: {this.state.email}</div>
-      {this.renderPhone()}
-      {this.renderTwitter()}
-      </React.Fragment>;
-    }
   }
 
   render() {
@@ -135,12 +111,6 @@ class Dashboard extends React.Component {
               </DashboardContent>
             </DashboardUserContent>
           </DashboardContentContainer>
-          <AddProfileInfoContainer >
-            <AddProfileInforHeader>
-            </AddProfileInforHeader>
-            <AddProfileInfoForm >
-            </AddProfileInfoForm>
-          </AddProfileInfoContainer>
         </RightPanel>
       </DashboardContainer>
     )
@@ -195,23 +165,5 @@ const DashboardUserContent = styled.div`
   flex-direction: column;
   padding: 25px 25px 25px 25px;
 `;
-
-const AddProfileInfoContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding-top: 30px;
-`;
-
-const AddProfileInforHeader = styled.div`
-  display: flex;
-  font-size: 24px;
-  padding-bottom: 10px;
-`;
-
-const AddProfileInfoForm = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
 
 export default Dashboard;
