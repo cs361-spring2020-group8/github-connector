@@ -21,18 +21,30 @@ class EditProfile extends React.Component {
       isLoaded: false,
       hasAuthError: false,
       hasServerError: false,
-      hasGithubProfileNotFoundError: false
+      hasGithubProfileNotFoundError: false,
+      token: ''
     };
   }
 
+  getJWTTokenAndID(){
+    const token = localStorage.getItem('access_token');
+    const decodedToken = jwt_decode(token);
+    const userID = decodedToken.id;
+
+    this.setState({
+      id: userID,
+      token: token
+    })
+
+    return decodedToken;
+  }
+
   componentDidMount() {
-    let token = localStorage.getItem('access_token');
-    let decoded = jwt_decode(token);
-    let userID = decoded.id;
+    this.getJWTTokenAndID();
 
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
-        const res = await DashboardApi.pullUserInfo(userID, token);
+        const res = await DashboardApi.pullUserInfo(this.state.id, this.state.token);
         if (res.status === 200) {
           this.setState({
             isLoaded: true,
@@ -60,15 +72,13 @@ class EditProfile extends React.Component {
     })
   }
 
+
   handleGithubProfileFormSubmit = async (event) =>{
     event.preventDefault();
-    let token = localStorage.getItem('access_token');
-    let decoded = jwt_decode(token);
-    let userID = decoded.id;
 
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
-        const res = await DashboardApi.linkGithubAccount(userID, token, this.state.github_username);
+        const res = await DashboardApi.linkGithubAccount(this.state.id, this.state.token, this.state.github_username);
         if (res.status === 200) {
           this.props.history.push('/dashboard');
         }
@@ -90,13 +100,10 @@ class EditProfile extends React.Component {
 
   handleEmailFormSubmit = async (event) =>{
     event.preventDefault();
-    let token = localStorage.getItem('access_token');
-    let decoded = jwt_decode(token);
-    let userID = decoded.id;
 
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
-        const res = await DashboardApi.updateEmailInformation(userID, token, this.state.email);
+        const res = await DashboardApi.updateEmailInformation(this.state.id, this.state.token, this.state.email);
         if (res.status === 200) {
           this.props.history.push('/dashboard');
         }
@@ -112,13 +119,10 @@ class EditProfile extends React.Component {
   }
   handleTwitterFormSubmit = async (event) =>{
     event.preventDefault();
-    let token = localStorage.getItem('access_token');
-    let decoded = jwt_decode(token);
-    let userID = decoded.id;
 
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
-        const res = await DashboardApi.updateTwitterInformation(userID, token, this.state.twitter);
+        const res = await DashboardApi.updateTwitterInformation(this.state.id, this.state.token, this.state.twitter);
         if (res.status === 200) {
           this.props.history.push('/dashboard');
         }
@@ -134,13 +138,10 @@ class EditProfile extends React.Component {
   }
   handlePhoneFormSubmit = async (event) =>{
     event.preventDefault();
-    let token = localStorage.getItem('access_token');
-    let decoded = jwt_decode(token);
-    let userID = decoded.id;
 
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
-        const res = await DashboardApi.updatePhoneInformation(userID, token, this.state.phone);
+        const res = await DashboardApi.updatePhoneInformation(this.state.id, this.state.token, this.state.phone);
 
         if (res.status === 200) {
           this.props.history.push('/dashboard');
@@ -193,7 +194,7 @@ class EditProfile extends React.Component {
                   <SubmitButton type="submit" value="Update Twitter"/>
                 </FormContainer>
                 <FormContainer onSubmit={this.handlePhoneFormSubmit}>
-                  <FormInput heading="phone" type="phone" value={this.state.phone} onChange={(event) => this.handleChange("phone", event)}/>
+                  <FormInput heading="Phone" type="phone" value={this.state.phone} onChange={(event) => this.handleChange("phone", event)}/>
                   <SubmitButton type="submit" value="Update Phone"/>
                 </FormContainer>
               </DashboardContent>
