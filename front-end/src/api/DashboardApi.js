@@ -25,9 +25,8 @@ export async function linkGithubAccount(userID, token, github_username) {
   return axios.put(`${url}/users/${userID}/github_info`, payload, config);
 }
 
-
 // Updates Profile Information
-export async function updateEmailInformation(userID, token, email) {
+export async function updateProfileInfo(userID, token, email, twitter, phone) {
   const config = {
     headers:{
       'Accept': 'application/json',
@@ -35,30 +34,8 @@ export async function updateEmailInformation(userID, token, email) {
       'Authorization': 'Bearer '  + token }
   };
   const payload = {
-    'email':email
-  };
-  return axios.put(`${url}/users/${userID}`, payload, config);
-}
-export async function updateTwitterInformation(userID, token, twitter) {
-  const config = {
-    headers:{
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer '  + token }
-  };
-  const payload = {
-    'twitter': twitter
-  };
-  return axios.put(`${url}/users/${userID}`, payload, config);
-}
-export async function updatePhoneInformation(userID, token, phone) {
-  const config = {
-    headers:{
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer '  + token }
-  };
-  const payload = {
+    'email':email,
+    'twitter': twitter,
     'phone': phone
   };
   return axios.put(`${url}/users/${userID}`, payload, config);

@@ -97,52 +97,12 @@ class EditProfile extends React.Component {
     });
   }
 
-
-  handleEmailFormSubmit = async (event) =>{
+  handleUpdateInfoFormSubmit = async (event) =>{
     event.preventDefault();
 
     this.setState({hasAuthError: false, hasServerError: false}, async () => {
       try {
-        const res = await DashboardApi.updateEmailInformation(this.state.id, this.state.token, this.state.email);
-        if (res.status === 200) {
-          this.props.history.push('/dashboard');
-        }
-      } catch (e) {
-        const {response: {status}} = e
-        if (status >= 400 && status < 500) {
-          this.setState({hasAuthError: true});
-        } else {
-          this.setState({hasServerError: true});
-        }
-      }
-    });
-  }
-  handleTwitterFormSubmit = async (event) =>{
-    event.preventDefault();
-
-    this.setState({hasAuthError: false, hasServerError: false}, async () => {
-      try {
-        const res = await DashboardApi.updateTwitterInformation(this.state.id, this.state.token, this.state.twitter);
-        if (res.status === 200) {
-          this.props.history.push('/dashboard');
-        }
-      } catch (e) {
-        const {response: {status}} = e
-        if (status >= 400 && status < 500) {
-          this.setState({hasAuthError: true});
-        } else {
-          this.setState({hasServerError: true});
-        }
-      }
-    });
-  }
-  handlePhoneFormSubmit = async (event) =>{
-    event.preventDefault();
-
-    this.setState({hasAuthError: false, hasServerError: false}, async () => {
-      try {
-        const res = await DashboardApi.updatePhoneInformation(this.state.id, this.state.token, this.state.phone);
-
+        const res = await DashboardApi.updateProfileInfo(this.state.id, this.state.token, this.state.email, this.state.twitter, this.state.phone);
         if (res.status === 200) {
           this.props.history.push('/dashboard');
         }
@@ -185,17 +145,11 @@ class EditProfile extends React.Component {
                 Edit Profile...
               </DashboardContentHeading>
               <DashboardContent>
-                <FormContainer onSubmit={this.handleEmailFormSubmit}>
+                <FormContainer onSubmit={this.handleUpdateInfoFormSubmit}>
                   <FormInput heading="Email" type="email" value={this.state.email} onChange={(event) => this.handleChange("email", event)}/>
-                  <SubmitButton type="submit" value="Update Email"/>
-                </FormContainer>
-                <FormContainer onSubmit={this.handleTwitterFormSubmit}>
                   <FormInput heading="Twitter" type="text" value={this.state.twitter} onChange={(event) => this.handleChange("twitter", event)}/>
-                  <SubmitButton type="submit" value="Update Twitter"/>
-                </FormContainer>
-                <FormContainer onSubmit={this.handlePhoneFormSubmit}>
                   <FormInput heading="Phone" type="phone" value={this.state.phone} onChange={(event) => this.handleChange("phone", event)}/>
-                  <SubmitButton type="submit" value="Update Phone"/>
+                  <SubmitButton type="submit" value="Update Profile"/>
                 </FormContainer>
               </DashboardContent>
               <ReturnToDashboard>

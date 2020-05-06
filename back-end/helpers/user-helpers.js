@@ -56,9 +56,12 @@ async function updateUser(userObject, userID) {
   // TODO: use query parameters in update request
   let queryString = `UPDATE users set `
   for (let [key, value] of Object.entries(userObject)) {
-    queryString += `${key} = '${value}' `
+    queryString += `${key} = '${value}', `
   }
   queryString += `where id = ${userID} RETURNING *`
+
+  // remove final comma from last key/value pair
+  queryString = queryString.replace(', where', ' where');
 
   return await makeDbQuery(queryString);
 }
