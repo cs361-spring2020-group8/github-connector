@@ -1,24 +1,15 @@
-import React, {Component} from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect,
 } from "react-router-dom";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
 import EditProfile from "./components/EditProfile";
 import { isLoggedIn } from './helpers/auth';
-
-// Adapted from https://tylermcginnis.com/react-router-protected-routes-authentication/
-const PrivateRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={(props) => (
-    isLoggedIn() === true
-      ? <Component {...props} />
-      : <Redirect to='/login' />
-  )} />
-)
+import { PrivateRoute } from './helpers/privateRoute';
 
 function App() {
   return (
