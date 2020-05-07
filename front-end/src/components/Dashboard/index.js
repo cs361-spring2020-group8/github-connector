@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import SideBarNav from '../../shared/SideBarNav';
 import jwt_decode from 'jwt-decode'
 import * as DashboardApi from '../../api/DashboardApi';
+import { Link } from "react-router-dom";
 
 
 class Dashboard extends React.Component {
@@ -68,25 +69,25 @@ class Dashboard extends React.Component {
   }
 
   renderLanguage = () => {
-    const github_language = this.state.github_info.language || 'None Listed';
-    return <div>Github Language: {github_language}</div>;
+    const githubLanguage = this.state.github_info.language || 'None Listed';
+    return <div>Github Language: {githubLanguage}</div>;
   }
 
   renderDashboardContent = () => {
-      return <React.Fragment>
+      return <>
         <div>Profile Information:</div>
         <br/>
         <div>Email: {this.state.email}</div>
         {!!this.state.phone && <div>Phone: {this.state.phone}</div>}
         {!!this.state.twitter && <div>Twitter: {this.state.twitter}</div>}
         {this.hasGithubInfo() &&
-          <React.Fragment>
+          <>
             <div>Github Page: <a href={"https://github.com/" + this.state.github_info.github_username}>
               {this.state.github_info.github_username}</a></div>
             {this.renderLanguage()}
-          </React.Fragment>
+          </>
         }
-      </React.Fragment>;
+      </>;
   }
 
   render() {
@@ -106,8 +107,12 @@ class Dashboard extends React.Component {
               <DashboardContent>
                 {this.renderDashboardContent()}
               </DashboardContent>
+              <EditProfileLinkContainer>
+               <Link to='/editprofile'>Click Here To Edit Profile</Link>
+              </EditProfileLinkContainer>
             </DashboardUserContent>
           </DashboardContentContainer>
+
         </RightPanel>
       </DashboardContainer>
     )
@@ -161,6 +166,11 @@ const DashboardUserContent = styled.div`
   display:flex;
   flex-direction: column;
   padding: 25px 25px 25px 25px;
+`;
+
+const EditProfileLinkContainer = styled.div`
+  display: flex;
+  font-size: 12px;
 `;
 
 export default Dashboard;
