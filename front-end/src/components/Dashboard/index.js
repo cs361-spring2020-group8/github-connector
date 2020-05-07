@@ -90,6 +90,20 @@ class Dashboard extends React.Component {
       </>;
   }
 
+  renderEditProfileLink = () => {
+    if(this.hasGithubInfo()){
+      return <>
+        <div> <Link to='/editprofile'>Click Here To Edit Profile</Link> </div>
+      </>
+    }else{
+      return <>
+        <div>Our app works best when you link your GitHub account.</div>
+        <br/>
+        <div> <Link to='/editprofile'>Click Here To Link Your GitHub Account And Edit Profile</Link> </div>
+      </>
+    }
+  }
+
   render() {
     return (
       <DashboardContainer>
@@ -108,7 +122,7 @@ class Dashboard extends React.Component {
                 {this.renderDashboardContent()}
               </DashboardContent>
               <EditProfileLinkContainer>
-               <Link to='/editprofile'>Click Here To Edit Profile</Link>
+                {this.renderEditProfileLink()}
               </EditProfileLinkContainer>
             </DashboardUserContent>
           </DashboardContentContainer>
@@ -169,8 +183,13 @@ const DashboardUserContent = styled.div`
 `;
 
 const EditProfileLinkContainer = styled.div`
-  display: flex;
-  font-size: 12px;
+   display: flex;
+   flex-direction: column;
+   padding: 25px 25px 25px 25px;
+   font-size: 12px;
+   font-weight: 400;
+   color: #2C3A41;
+   margin-bottom: 16px;
 `;
 
 export default Dashboard;
