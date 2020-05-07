@@ -1,6 +1,6 @@
 # github-connector
 ## How to run project with Docker
-### **[Docker Required](https://www.docker.com/)**
+### **Docker Compose Required. [Please click here to see instructions on how to install Docker Desktop for your OS.](https://docs.docker.com/compose/install/)**
 1.  If running for the first time: Run `docker-compose build`
 1.  Run `docker-compose up`
 1.  To shut down project, press `Ctrl-C` and `docker-compose down`
