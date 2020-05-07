@@ -69,25 +69,25 @@ class Dashboard extends React.Component {
   }
 
   renderLanguage = () => {
-    const github_language = this.state.github_info.language || 'None Listed';
-    return <div>Github Language: {github_language}</div>;
+    const githubLanguage = this.state.github_info.language || 'None Listed';
+    return <div>Github Language: {githubLanguage}</div>;
   }
 
   renderDashboardContent = () => {
-      return <React.Fragment>
+      return <>
         <div>Profile Information:</div>
         <br/>
         <div>Email: {this.state.email}</div>
         {!!this.state.phone && <div>Phone: {this.state.phone}</div>}
         {!!this.state.twitter && <div>Twitter: {this.state.twitter}</div>}
         {this.hasGithubInfo() &&
-          <React.Fragment>
+          <>
             <div>Github Page: <a href={"https://github.com/" + this.state.github_info.github_username}>
               {this.state.github_info.github_username}</a></div>
             {this.renderLanguage()}
-          </React.Fragment>
+          </>
         }
-      </React.Fragment>;
+      </>;
   }
 
   render() {
@@ -168,7 +168,7 @@ const DashboardUserContent = styled.div`
   padding: 25px 25px 25px 25px;
 `;
 
-const EditProfileLinkContainer =styled.div`
+const EditProfileLinkContainer = styled.div`
   display: flex;
   font-size: 12px;
 `;

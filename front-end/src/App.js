@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Component} from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -11,10 +11,22 @@ import Login from "./components/Login";
 import EditProfile from "./components/EditProfile";
 import { isLoggedIn } from './helpers/auth';
 
+// Adapted from https://tylermcginnis.com/react-router-protected-routes-authentication/
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    isLoggedIn() === true
+      ? <Component {...props} />
+      : <Redirect to='/login' />
+  )} />
+)
+
 function App() {
   return (
     <Router>
       <Switch>
+        <Route path="/login">
+          <Login />
+        </Route>
         <Route path="/signup" render={() => (
           isLoggedIn() ? (
             <Dashboard />
@@ -23,33 +35,9 @@ function App() {
           )
         )}>
         </Route>
-        <Route path="/dashboard" render={() => (
-          isLoggedIn() ? (
-            <Dashboard />
-          ) : (
-            <Login />
-          )
-        )}>
-        </Route>
-        <Route path="/login">
-          <Login />
-        </Route>
-        <Route path="/editprofile" render={() => (
-          isLoggedIn() ? (
-            <EditProfile />
-          ) : (
-            <Login />
-          )
-        )}>
-        </Route>
-        <Route exact path="/" render={() => (
-          isLoggedIn() ? (
-            <Redirect to="/dashboard"/>
-          ) : (
-            <Login />
-          )
-        )}>
-        </Route>
+        <PrivateRoute path='/editprofile' component={EditProfile}/>
+        <PrivateRoute path='/dashboard' component={Dashboard}/>
+        <PrivateRoute path='/' component={Dashboard}/>
       </Switch>
     </Router>
   );

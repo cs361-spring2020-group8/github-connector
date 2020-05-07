@@ -126,7 +126,7 @@ class EditProfile extends React.Component {
           <DashboardContentContainer>
             <DashboardUserContent>
               {!this.state.github_info &&
-                <React.Fragment>
+                <>
                 <DashboardContentHeading>
                   Attach Github Account
                 </DashboardContentHeading>
@@ -139,8 +139,7 @@ class EditProfile extends React.Component {
                     </ErrorText>
                   </FormContainer>
                 </DashboardContent>
-                </React.Fragment>
-              }
+                </> }
               <DashboardContentHeading>
                 Edit Profile...
               </DashboardContentHeading>

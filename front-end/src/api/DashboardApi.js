@@ -7,20 +7,20 @@ export async function pullUserInfo(userID, token) {
   return axios.get(`${url}/users/${userID}`,{ headers:{
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '  + token }
+      'Authorization': `Bearer ${token}` }
   });
 }
 
 //Attempts to link Github Account
-export async function linkGithubAccount(userID, token, github_username) {
+export async function linkGithubAccount(userID, token, githubUsername) {
   const config = {
     headers:{
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '  + token }
+      'Authorization': `Bearer ${token}` }
   };
   const payload = {
-    'github_username': github_username
+    'github_username': githubUsername
   };
   return axios.put(`${url}/users/${userID}/github_info`, payload, config);
 }
@@ -31,7 +31,7 @@ export async function updateProfileInfo(userID, token, email, twitter, phone) {
     headers:{
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '  + token }
+      'Authorization': `Bearer ${token}` }
   };
   const payload = {
     'email':email,
