@@ -185,7 +185,7 @@ const DashboardUserContent = styled.div`
 const EditProfileLinkContainer = styled.div`
    display: flex;
    flex-direction: column;
-   padding: 25px 25px 25px 25px;
+   padding: 25px;
    font-size: 12px;
    font-weight: 400;
    color: #2C3A41;
