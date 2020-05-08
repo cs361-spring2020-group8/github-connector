@@ -30,14 +30,14 @@ class Dashboard extends React.Component {
       try {
         const res = await DashboardApi.pullUserInfo(userID, token);
         if (res.status === 200) {
-            this.setState({
-              isLoaded: true,
-              id: res.data[0].id,
-              email: res.data[0].email,
-              twitter: res.data[0].twitter,
-              phone: res.data[0].phone,
-              github_info: res.data[0].github_info
-            });
+          this.setState({
+            isLoaded: true,
+            id: res.data[0].id,
+            email: res.data[0].email,
+            twitter: res.data[0].twitter,
+            phone: res.data[0].phone,
+            github_info: res.data[0].github_info
+          });
         }
       } catch (e) {
         const {response: {status}} = e
@@ -64,7 +64,7 @@ class Dashboard extends React.Component {
     if(this.hasGithubInfo()){
       return <img src={this.state.github_info.profile_image_url} alt='userGHImage' height='150px'/>;
     } else {
-      return null;
+      return <img src={process.env.PUBLIC_URL + '/default_avatar.png'} alt='userDefault' height='150px'/>;
     }
   }
 
@@ -74,47 +74,61 @@ class Dashboard extends React.Component {
   }
 
   renderDashboardContent = () => {
+    return <>
+      <div>Profile Information:</div>
+      <br/>
+      <div>Email: {this.state.email}</div>
+      {!!this.state.phone && <div>Phone: {this.state.phone}</div>}
+      {!!this.state.twitter && <div>Twitter: {this.state.twitter}</div>}
+      {this.hasGithubInfo() &&
+      <>
+        <div>Github Page: <a href={"https://github.com/" + this.state.github_info.github_username}>
+          {this.state.github_info.github_username}</a></div>
+        {this.renderLanguage()}
+      </>
+      }
+    </>;
+  }
+
+  renderEditProfileLink = () => {
+    if(this.hasGithubInfo()){
       return <>
-        <div>Profile Information:</div>
+        <div> <Link to='/editprofile'>Click Here To Edit Profile</Link> </div>
+      </>
+    }else{
+      return <>
+        <div>Our app works best when you link your GitHub account.</div>
         <br/>
-        <div>Email: {this.state.email}</div>
-        {!!this.state.phone && <div>Phone: {this.state.phone}</div>}
-        {!!this.state.twitter && <div>Twitter: {this.state.twitter}</div>}
-        {this.hasGithubInfo() &&
-          <>
-            <div>Github Page: <a href={"https://github.com/" + this.state.github_info.github_username}>
-              {this.state.github_info.github_username}</a></div>
-            {this.renderLanguage()}
-          </>
-        }
-      </>;
+        <div> <Link to='/editprofile'>Click Here To Link Your GitHub Account And Edit Profile</Link> </div>
+      </>
+    }
   }
 
   render() {
     return (
-      <DashboardContainer>
-        <SideBarNav>
-        </SideBarNav>
-        <RightPanel>
-          <DashboardContentContainer>
-            <DashboardUserProfileImage>
-              {this.renderGitHubImage()}
-            </DashboardUserProfileImage>
-            <DashboardUserContent>
-              <DashboardContentHeading>
-                {this.renderWelcome()}
-              </DashboardContentHeading>
-              <DashboardContent>
-                {this.renderDashboardContent()}
-              </DashboardContent>
-              <EditProfileLinkContainer>
-               <Link to='/editprofile'>Click Here To Edit Profile</Link>
-              </EditProfileLinkContainer>
-            </DashboardUserContent>
-          </DashboardContentContainer>
+        <DashboardContainer>
+          <SideBarNav>
+          </SideBarNav>
+          <RightPanel>
+            <DashboardContentContainer>
+              <DashboardUserProfileImage>
+                {this.renderGitHubImage()}
+              </DashboardUserProfileImage>
+              <DashboardUserContent>
+                <DashboardContentHeading>
+                  {this.renderWelcome()}
+                </DashboardContentHeading>
+                <DashboardContent>
+                  {this.renderDashboardContent()}
+                </DashboardContent>
+                <EditProfileLinkContainer>
+                  {this.renderEditProfileLink()}
+                </EditProfileLinkContainer>
+              </DashboardUserContent>
+            </DashboardContentContainer>
 
-        </RightPanel>
-      </DashboardContainer>
+          </RightPanel>
+        </DashboardContainer>
     )
   }
 }
@@ -169,8 +183,13 @@ const DashboardUserContent = styled.div`
 `;
 
 const EditProfileLinkContainer = styled.div`
-  display: flex;
-  font-size: 12px;
+   display: flex;
+   flex-direction: column;
+   padding: 25px;
+   font-size: 12px;
+   font-weight: 400;
+   color: #2C3A41;
+   margin-bottom: 16px;
 `;
 
 export default Dashboard;
