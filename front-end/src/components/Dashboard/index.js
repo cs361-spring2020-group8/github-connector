@@ -64,7 +64,7 @@ class Dashboard extends React.Component {
     if(this.hasGithubInfo()){
       return <img src={this.state.github_info.profile_image_url} alt='userGHImage' height='150px'/>;
     } else {
-      return null;
+      return <img src={process.env.PUBLIC_URL + '/default_avatar.png'} alt='userDefault' height='150px'/>;
     }
   }
 
