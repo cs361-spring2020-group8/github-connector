@@ -8,7 +8,7 @@ function createJWT(id) {
 
 function getUserIdFromToken(req, res) {
   if (!req.headers["authorization"]) {
-    rejectAsUnauthorized(res)
+    return rejectAsUnauthorized(res);
   }
 
   const bearerHeader = req.headers["authorization"];
