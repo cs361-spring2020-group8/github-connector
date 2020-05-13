@@ -17,9 +17,9 @@
     "styled-components": "^5.1.0"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development PORT=3001 react-scripts start",
-    "build": "cross-env NODE_ENV=production react-scripts build",
-    "test": "cross-env NODE_ENV=development react-scripts test",
+    "start": "cross-env PORT=3001 react-scripts start",
+    "build": "cross-env react-scripts build",
+    "test": "cross-env react-scripts test",
     "eject": "cross-env react-scripts eject"
   },
   "eslintConfig": {
