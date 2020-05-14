@@ -24,12 +24,11 @@ async function getUserLanguage(userID) {
       query,
       [userID]
   );
-  return userLanguage;
+  return userLanguage.language;
 }
 
 async function getRecommendations(userID) {
-  const languageResponse = await getUserLanguage(userID);
-  const languageToMatch = languageResponse.language;
+  const languageToMatch = await getUserLanguage(userID);
 
   // user_id clause so they are not recommended to connect with themself.
   // ordered randomly so that same recommendations don't happen every time.
