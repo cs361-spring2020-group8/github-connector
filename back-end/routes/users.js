@@ -63,18 +63,14 @@ router.post('/login', [
 });
 
 /* GET users recommendations */
-router.get('/:id/recommendations', validateSelfJWT, async function(req, res, next) {
+router.get('/:id/recommendations', async function(req, res, next) {
   // veryify permission and retrieve ID.
-  const userID = await getUserIdFromToken(req, res);
+  const userID = req.params.id;
 
   // use helper to retrieve recommendation list.
   let responseBody = await getRecommendations(userID);
 
-  if (!responseBody) {
-    // no user data could be found
-    return res.status(403).send('No recommendations for user.');
-  }
-  return res.status(200).send([responseBody]);
+  return res.status(200).send(responseBody);
 });
 
 /* POST to create new users */
