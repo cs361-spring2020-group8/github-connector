@@ -6,7 +6,7 @@ const {check, body, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
-const { getUserByEmail, getFullUserProfile, createUser, updateUser } = require('../helpers/user-helpers')
+const { getUserByEmail, getFullUserProfile, getRecommendations, createUser, updateUser } = require('../helpers/user-helpers')
 const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage, returnNotFound } = require('../helpers/response-helpers')
 const { validateSelfJWT } = require('../middlewares/jwt-validators');
 const { checkValidation } = require('../middlewares/body-validators');
@@ -60,6 +60,21 @@ router.post('/login', [
   } catch(err) {
     res.status(500).send(err);
   }
+});
+
+/* GET users recommendations */
+router.get('/:id/recommendations', validateSelfJWT, async function(req, res, next) {
+  // veryify permission and retrieve ID.
+  const userID = await getUserIdFromToken(req, res);
+
+  // use helper to retrieve recommendation list.
+  let responseBody = await getRecommendations(userID);
+
+  if (!responseBody) {
+    // no user data could be found
+    return res.status(403).send('No recommendations for user.');
+  }
+  return res.status(200).send([responseBody]);
 });
 
 /* POST to create new users */
