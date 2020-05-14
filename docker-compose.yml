@@ -15,6 +15,7 @@ services:
     stdin_open: true
     volumes:
       - ./front-end:/usr/src/app/frontend:cached
+      - /usr/src/app/frontend/node_modules
   backend:
     build: ./back-end
     container_name: ghc-backend
