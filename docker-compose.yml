@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  frontend:
+    build: ./front-end
+    container_name: ghc-frontend
+    depends_on:
+      - backend
+    expose:
+      - 3001
+    ports:
+      - 3001:3001
+    environment:
+      - PORT=3001
+    stdin_open: true
+    volumes:
+      - ./front-end:/usr/src/app/frontend:cached
+  backend:
+    build: ./back-end
+    container_name: ghc-backend
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+      - DB_DATABASE=githubconnector
+      - DB_HOST=database
+      - PORT=3000
+      - REACT_PORT=3001
+      - ACCESS_TOKEN_SECRET=supersecret
+      - NODE_ENV=dockerlocal
+    depends_on:
+      - database
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
+    volumes:
+      - ./back-end:/usr/src/app/backend:cached
+      - /usr/src/app/backend/node_modules
+  database:
+    container_name: ghc-database
+    restart: always
+    image: postgres:12.2-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=githubconnector
+    volumes:
+      # Database persistence: Comment out bottom line to remove persistence
+      - ./database/pgdata:/var/lib/postgresql/data
+      - ./database/20200506_create-schema.sql:/docker-entrypoint-initdb.d/20200506_create-schema.sql
