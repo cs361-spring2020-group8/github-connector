@@ -36,7 +36,7 @@ async function getRecommendations(userID) {
   if(languageToMatch) {
     // user_id clause so they are not recommended to connect with themself.
     // ordered randomly so that same recommendations don't happen every time.
-    const query = 'SELECT id, email, phone, twitter FROM users INNER JOIN' +
+    const query = 'SELECT id, email FROM users INNER JOIN' +
         '(SELECT user_id FROM github_info ' +
         'WHERE language=$1 AND user_id!=$2 ' +
         'ORDER BY RANDOM() ' +
@@ -47,7 +47,6 @@ async function getRecommendations(userID) {
         query,
         [languageToMatch, userID]
     );
-    console.log(listOfMatches);
     return listOfMatches;
   }else{
     return false;
