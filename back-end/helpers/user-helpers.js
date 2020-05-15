@@ -24,27 +24,34 @@ async function getUserLanguage(userID) {
       query,
       [userID]
   );
-  return userProfile.language;
+  if(userProfile === undefined){
+    return false;
+  }else {
+    return userProfile.language;
+  }
 }
 
 async function getRecommendations(userID) {
   const languageToMatch = await getUserLanguage(userID);
+  if(languageToMatch) {
+    // user_id clause so they are not recommended to connect with themself.
+    // ordered randomly so that same recommendations don't happen every time.
+    const query = 'SELECT id, email, phone, twitter FROM users INNER JOIN' +
+        '(SELECT user_id FROM github_info ' +
+        'WHERE language=$1 AND user_id!=$2 ' +
+        'ORDER BY RANDOM() ' +
+        'LIMIT 5) AS matches ON ' +
+        'users.id=matches.user_id';
 
-  // user_id clause so they are not recommended to connect with themself.
-  // ordered randomly so that same recommendations don't happen every time.
-  const query = 'SELECT id, email, phone, twitter FROM users INNER JOIN' +
-  '(SELECT user_id FROM github_info ' +
-  'WHERE language=$1 AND user_id!=$2 ' +
-  'ORDER BY RANDOM() ' +
-  'LIMIT 5) AS matches ON ' +
-  'users.id=matches.user_id';
-
-  const listOfMatches = await queryWithParametersForMultipleRows(
-      query,
-      [languageToMatch, userID]
-  );
-
-  return listOfMatches;
+    const listOfMatches = await queryWithParametersForMultipleRows(
+        query,
+        [languageToMatch, userID]
+    );
+    console.log(listOfMatches);
+    return listOfMatches;
+  }else{
+    return false;
+  }
 }
 
 async function getFullUserProfile(userID) {

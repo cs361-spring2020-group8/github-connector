@@ -70,7 +70,11 @@ router.get('/:id/recommendations', async function(req, res, next) {
   // use helper to retrieve recommendation list.
   let responseBody = await getRecommendations(userID);
 
-  return res.status(200).send(responseBody);
+  if(responseBody) {
+    return res.status(200).send(responseBody);
+  }else{
+    return res.status(403).send('No user language.');
+  }
 });
 
 /* POST to create new users */
