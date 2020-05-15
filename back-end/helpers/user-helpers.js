@@ -20,11 +20,11 @@ async function getUserGitHubInfo(userID) {
 
 async function getUserLanguage(userID) {
   const query = 'SELECT language FROM github_info WHERE user_id = $1';
-  const userLanguage = await queryWithParameters(
+  const userProfile = await queryWithParameters(
       query,
       [userID]
   );
-  return userLanguage.language;
+  return userProfile.language;
 }
 
 async function getRecommendations(userID) {
