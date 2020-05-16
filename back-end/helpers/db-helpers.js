@@ -19,7 +19,18 @@ async function queryWithParameters(queryString, parameters) {
   }
 }
 
+async function queryWithParametersForMultipleRows(queryString, parameters) {
+  try {
+    const results = await pool.query(queryString, parameters);
+
+    return results.rows;
+  } catch (err) {
+    throw err;
+  }
+}
+
 module.exports = {
    makeDbQuery,
    queryWithParameters,
+   queryWithParametersForMultipleRows,
 }
