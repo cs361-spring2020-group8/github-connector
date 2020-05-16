@@ -1,4 +1,4 @@
-const { makeDbQuery, queryWithParameters } = require('./db-helpers')
+const { makeDbQuery, queryWithParameters, queryWithParametersForMultipleRows } = require('./db-helpers')
 
 async function getUserByEmail(email) {
   const query = 'SELECT password, id FROM users WHERE email = $1';
@@ -16,6 +16,41 @@ async function getUserGitHubInfo(userID) {
     [userID]
   );
   return userGitHubData;
+}
+
+async function getUserLanguage(userID) {
+  const query = 'SELECT language FROM github_info WHERE user_id = $1';
+  const userProfile = await queryWithParameters(
+      query,
+      [userID]
+  );
+  if(userProfile === undefined){
+    return false;
+  }else {
+    return userProfile.language;
+  }
+}
+
+async function getRecommendations(userID) {
+  const languageToMatch = await getUserLanguage(userID);
+  if(languageToMatch) {
+    // user_id clause so they are not recommended to connect with themself.
+    // ordered randomly so that same recommendations don't happen every time.
+    const query = 'SELECT id, email FROM users INNER JOIN' +
+        '(SELECT user_id FROM github_info ' +
+        'WHERE language=$1 AND user_id!=$2 ' +
+        'ORDER BY RANDOM() ' +
+        'LIMIT 5) AS matches ON ' +
+        'users.id=matches.user_id';
+
+    const listOfMatches = await queryWithParametersForMultipleRows(
+        query,
+        [languageToMatch, userID]
+    );
+    return listOfMatches;
+  }else{
+    return false;
+  }
 }
 
 async function getFullUserProfile(userID) {
@@ -69,6 +104,7 @@ async function updateUser(userObject, userID) {
 module.exports = {
    getUserByEmail,
    getFullUserProfile,
+   getRecommendations,
    createUser,
    updateUser,
    getUserGitHubInfo,
