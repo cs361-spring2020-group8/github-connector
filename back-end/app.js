@@ -1,8 +1,10 @@
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+const morgan = require('morgan');
+const logger = require('./helpers/logger');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -32,7 +34,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.use(logger('dev'));
+app.use(morgan('combined', { stream: { write: message => logger.info(message.trim())}}));
 app.use(bodyParser.json());
 // configure the app to use bodyParser()
 app.use(bodyParser.urlencoded({
