@@ -1,5 +1,5 @@
 const { createLogger, format, transports } = require('winston');
-const { printf, align, combine, timestamp, prettyPrint, json, colorize } = format;
+const { printf, combine, timestamp, prettyPrint, json, colorize } = format;
 
 class Logger {
   constructor() {

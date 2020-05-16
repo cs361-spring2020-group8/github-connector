@@ -71,4 +71,5 @@ module.exports = {
    getFullUserProfile,
    createUser,
    updateUser,
+   getUserGitHubInfo,
 }

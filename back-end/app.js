@@ -34,7 +34,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.use(morgan('combined', { stream: { write: message => logger.info(message.trim())}}));
+app.use(morgan('dev', { stream: { write: message => logger.info(message.trim())}}));
 app.use(bodyParser.json());
 // configure the app to use bodyParser()
 app.use(bodyParser.urlencoded({
