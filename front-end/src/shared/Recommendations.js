@@ -1,12 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import { getUserIdFromJWT } from '../helpers/auth';
 import { fetchRecommendedUsers } from '../api/RecommendationsApi';
+import { getUserIdFromJWT } from '../helpers/auth';
+import LoadingSpinner from '../shared/LoadingSpinner';
 import RecommendationsListItem from './RecommendationsListItem';
 
 class Recommendations extends React.Component {
   state = {
     recommendedUsers: [],
+    isLoading: true,
+    hasError: false,
   }
 
   componentDidMount() {
@@ -19,36 +22,76 @@ class Recommendations extends React.Component {
     try {
       const recommendedUsers = await fetchRecommendedUsers(userId);
 
-      this.setState({ recommendedUsers });
+      this.setState({ recommendedUsers, isLoading: false });
     } catch (err) {
-
+      this.setState({ isLoading: false, hasError: true });
     }
+  }
+
+  handleInviteRequest = (userId) => async () => {
+    // TODO: add connection
+    alert(`TODO: Send invite to user ${userId}`);
+  }
+
+  handleIgnoreUser = (userId) => async () => {
+    // TODO: ignore user
+    alert(`TODO: Ignore user ${userId}`);
+  }
+
+  renderRecommendedUsersList = () => {
+    if (this.state.hasError) {
+      return <RecNotification>An error has occurred. Please try again.</RecNotification>
+    }
+
+    if (!this.state.recommendedUsers.length) {
+      return <RecNotification>No users to recommend!</RecNotification>
+    }
+
+    return (
+      <RecList>
+        {this.state.recommendedUsers.map((user) => {
+          return (
+            <RecommendationsListItem
+              key={user.id}
+              email={user.email}
+              onInvite={this.handleInviteRequest(user.id)}
+              onIgnore={this.handleIgnoreUser(user.id)}
+            />
+          );
+        })}
+      </RecList>
+    );
   }
 
   render() {
     return (
-      <RecommendationsContainer>
-        <RecommendationsHeader>Recommended Connections</RecommendationsHeader>
-        <RecommendationsList>
-          {this.state.recommendedUsers.map((user) => {
-            return <RecommendationsListItem key={user.id} id={user.id} email={user.email} />
-          })}
-        </RecommendationsList>
-      </RecommendationsContainer>
+      <RecContainer>
+        <RecHeader>Recommended Connections</RecHeader>
+        {this.state.isLoading ? <RecSpinner /> : this.renderRecommendedUsersList()}
+      </RecContainer>
     );
   }
 }
 
-const RecommendationsHeader = styled.h1`
+const RecSpinner = styled(LoadingSpinner)`
+  margin: 10px auto;
+`
+
+const RecNotification = styled.div`
+  text-align: center;
+  margin: 10px;
+`
+
+const RecHeader = styled.h1`
   margin: 0;
 `
 
-const RecommendationsList = styled.ul`
+const RecList = styled.ul`
   list-style-type: none;
-  padding-left: 20px;
+  padding: 0;
 `
 
-const RecommendationsContainer = styled.div`
+const RecContainer = styled.div`
   width: 75%;
   padding: 15px 30px;
   background-color: #e5e5e5;

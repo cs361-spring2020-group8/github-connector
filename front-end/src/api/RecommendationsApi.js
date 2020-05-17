@@ -1,28 +1,21 @@
 import axios from 'axios';
+import { getBearerToken } from '../helpers/auth';
 
-const MOCK_USERS = [
-  {
-    id: 100,
-    email: 'test123@gmail.com',
-  },
-  {
-    id: 101,
-    email: 'test321@gmail.com',
-  },
-  {
-    id: 102,
-    email: 'test213@gmail.com',
-  },
-  {
-    id: 103,
-    email: 'test312@gmail.com',
-  },
-  {
-    id: 104,
-    email: 'test111@gmail.com',
-  },
-]
+const baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://githubconnector.herokuapp.com';
+
+function getAxiosConfig() {
+  return {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getBearerToken()}`,
+    },
+    baseURL,
+  }
+} 
 
 export async function fetchRecommendedUsers(userId) {
-  return Promise.resolve(MOCK_USERS);
+  const response = await axios.get(`/users/${userId}/recommendations`, getAxiosConfig());
+
+  return response.data;
 }
