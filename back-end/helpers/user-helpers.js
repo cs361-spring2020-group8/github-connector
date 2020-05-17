@@ -107,4 +107,5 @@ module.exports = {
    getRecommendations,
    createUser,
    updateUser,
+   getUserGitHubInfo,
 }
