@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { ReactComponent as CancelIcon } from './cancel-icon.svg';
+import CancelIcon from './CancelIcon';
 
 class RecommendationsListItem extends React.Component {
   state = {
