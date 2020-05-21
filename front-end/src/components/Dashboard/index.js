@@ -4,6 +4,7 @@ import SideBarNav from '../../shared/SideBarNav';
 import jwt_decode from 'jwt-decode'
 import * as DashboardApi from '../../api/DashboardApi';
 import { Link } from "react-router-dom";
+import Recommendations from '../../shared/Recommendations';
 
 
 class Dashboard extends React.Component {
@@ -110,6 +111,7 @@ class Dashboard extends React.Component {
           <SideBarNav>
           </SideBarNav>
           <RightPanel>
+            {this.state.github_info && <Recommendations />}
             <DashboardContentContainer>
               <DashboardUserProfileImage>
                 {this.renderGitHubImage()}
@@ -126,7 +128,6 @@ class Dashboard extends React.Component {
                 </EditProfileLinkContainer>
               </DashboardUserContent>
             </DashboardContentContainer>
-
           </RightPanel>
         </DashboardContainer>
     )
