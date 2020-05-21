@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { fetchRecommendedUsers } from '../api/RecommendationsApi';
 import { getUserIdFromJWT } from '../helpers/auth';
@@ -67,10 +68,15 @@ class Recommendations extends React.Component {
     return (
       <RecContainer>
         <RecHeader>Recommended Connections</RecHeader>
+        <RecSubHeader>Based on your preferred language: {this.props.preferredLanguage || 'No Preference'}</RecSubHeader>
         {this.state.isLoading ? <RecSpinner /> : this.renderRecommendedUsersList()}
       </RecContainer>
     );
   }
+}
+
+Recommendations.propTypes = {
+  preferredLanguage: PropTypes.string,
 }
 
 const RecSpinner = styled(LoadingSpinner)`
@@ -84,6 +90,11 @@ const RecNotification = styled.div`
 
 const RecHeader = styled.h1`
   margin: 0;
+`
+
+const RecSubHeader = styled.h2`
+  margin: 5px 0;
+  font-size: 1.2em;
 `
 
 const RecList = styled.ul`
