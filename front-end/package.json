@@ -16,9 +16,9 @@
   },
   "scripts": {
     "start": "cross-env PORT=3001 react-scripts start",
-    "build": "cross-env react-scripts build",
-    "test": "cross-env react-scripts test",
-    "eject": "cross-env react-scripts eject"
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
