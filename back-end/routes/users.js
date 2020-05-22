@@ -100,8 +100,8 @@ router.post('/', [
         return res.status(400).json({ errors: errors.array() });
       }
 
-      // get email password from request body
-      const { email, password } = req.body;
+      // get email from request body
+      const { email } = req.body;
 
       // check if email is already in use
       let dbResults = await getUserByEmail(email);
@@ -112,7 +112,7 @@ router.post('/', [
 
       // salt and hash password
       const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const hashedPassword = await bcrypt.hash(req.body.password || '', salt);
 
       // create user in DB
       dbResults = await createUser(email, hashedPassword);
