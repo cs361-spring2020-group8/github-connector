@@ -111,7 +111,7 @@ class Dashboard extends React.Component {
           <SideBarNav>
           </SideBarNav>
           <RightPanel>
-            {this.state.github_info && <Recommendations />}
+            {this.state.github_info && <Recommendations preferredLanguage={this.state.github_info.language} />}
             <DashboardContentContainer>
               <DashboardUserProfileImage>
                 {this.renderGitHubImage()}
