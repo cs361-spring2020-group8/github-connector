@@ -14,3 +14,11 @@ CREATE TABLE github_info (
     profile_image_url VARCHAR(1000),
     language VARCHAR(255)
 );
+
+CREATE TABLE connections (
+    id SERIAL NOT NULL PRIMARY KEY,
+    user1_id INTEGER NOT NULL,
+    user2_id INTEGER NOT NULL,
+    recommendation_accepted BOOLEAN DEFAULT NULL,
+    connection_accepted BOOLEAN DEFAULT NULL
+);
