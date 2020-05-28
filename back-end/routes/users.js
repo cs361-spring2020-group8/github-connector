@@ -170,7 +170,7 @@ router.put(
   }
 );
 
-// Attach valid GitHub user profile to user account
+// Accept/reject recommendations
 router.put(
   '/:id/recommendations',
   validateSelfJWT,
