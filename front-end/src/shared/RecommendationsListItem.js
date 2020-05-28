@@ -44,9 +44,9 @@ class RecommendationsListItem extends React.Component {
     return (
       <li>
         <RecommendedUserContainer>
-          <span>
-            {this.props.email}
-          </span>
+          <a href={'https://github.com/' + this.props.github_username}>
+            {this.props.github_username}
+          </a>
           <ButtonWrapper>
             <InviteButton
               disabled={this.state.hasSentRequest}
@@ -66,7 +66,7 @@ class RecommendationsListItem extends React.Component {
 }
 
 RecommendationsListItem.propTypes = {
-  email: PropTypes.string.isRequired,
+  github_username: PropTypes.string.isRequired,
   onInvite: PropTypes.func.isRequired,
   onIgnore: PropTypes.func.isRequired,
 }
