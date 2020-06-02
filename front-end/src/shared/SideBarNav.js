@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 class SideBarNav extends React.Component {
   handleSignOut = () => {
     localStorage.removeItem('access_token');
-    window.location.reload(true);
+    window.location.href = "/login";
   }
 
   render() {
