@@ -96,7 +96,7 @@ async function getFullConnectionProfile(requestedID, userID) {
   delete connectionData.password;
   const connectionGithubData = await getUserGitHubInfo(requestedID);
   if (!connectionGithubData) {
-    logger.warn(`No GitHub info found for the id requestedID`)
+    logger.warn(`No GitHub info found for the id ${requestedID}`)
     connectionData.github_info = null;
   } else {
     connectionData.github_info = connectionGithubData;

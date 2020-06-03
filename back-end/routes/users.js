@@ -18,7 +18,7 @@ const PASSWORD_MIN_LENGTH = 8;
 
 // user routes
 /* GET user by ID */
-router.get('/:id', validateSelfJWT, async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
 
   const requestedID = req.params.id;
 
@@ -36,7 +36,7 @@ router.get('/:id', validateSelfJWT, async function(req, res, next) {
 
   if (!responseBody) {
     // no user data could be found
-    logger.warn(`User with id ${userId} not found in database`);
+    logger.warn(`User with id ${requestedID} not found in database`);
     return res.status(404).send('Not found.');
   }
   return res.status(200).send([responseBody]);
