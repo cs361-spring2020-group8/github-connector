@@ -6,7 +6,7 @@ const {check, body, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
-const { getUserByEmail, getFullUserProfile, getRecommendations, createUser, updateUser, getUserGitHubInfo } = require('../helpers/user-helpers')
+const { getUserByEmail, getFullUserProfile, getRecommendations, createUser, updateUser, getUserGitHubInfo, getFullConnectionProfile } = require('../helpers/user-helpers')
 const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage, returnNotFound } = require('../helpers/response-helpers')
 const { validateSelfJWT } = require('../middlewares/jwt-validators');
 const { checkValidation } = require('../middlewares/body-validators');
@@ -19,12 +19,21 @@ const PASSWORD_MIN_LENGTH = 8;
 // user routes
 /* GET user by ID */
 router.get('/:id', validateSelfJWT, async function(req, res, next) {
+
+  const requestedID = req.params.id;
+
   // verify user has permission to get this data
   const userID = await getUserIdFromToken(req, res);
+  let responseBody;
 
-  logger.info(`Getting full user profile for user ${userID}`);
+  if (requestedID !== userID) {
+    logger.info('Requested ID is different from User ID. Getting full user profile for possible connection');
+    responseBody = await getFullConnectionProfile(requestedID, userID);
+  } else {
+    logger.info(`Getting full user profile for user ${requestedID}`);
+    responseBody = await getFullUserProfile(requestedID);
+  }
 
-  let responseBody = await getFullUserProfile(userID);
   if (!responseBody) {
     // no user data could be found
     logger.warn(`User with id ${userId} not found in database`);

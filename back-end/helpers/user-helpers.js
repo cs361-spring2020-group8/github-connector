@@ -1,4 +1,5 @@
 const { makeDbQuery, queryWithParameters, queryWithParametersForMultipleRows } = require('./db-helpers')
+const logger = require('../helpers/logger');
 
 async function getUserByEmail(email) {
   const query = 'SELECT password, id FROM users WHERE email = $1';
@@ -73,6 +74,37 @@ async function getFullUserProfile(userID) {
   return userData;
 }
 
+async function getFullConnectionProfile(requestedID, userID) {
+  const query = 'SELECT users.* FROM users ' +
+    'INNER JOIN connections ON ' +
+    'users.id = connections.user1_id OR users.id = connections.user2_id ' +
+    'WHERE users.id = $1 ' +
+    'AND ((connections.user1_id = $1 AND connections.user2_id = $2) ' +
+    'OR (connections.user1_id = $2 AND connections.user2_id = $1))' +
+    'AND connections.connection_accepted = true'
+  ;
+
+  const connectionData = await queryWithParameters(query, [requestedID, userID]);
+
+  if (!connectionData) {
+    logger.warn(`Unable to find user. Ensure that a valid connection is made. User ID: ${userID}, Requested ID: ${requestedID}`)
+    return null;
+  }
+
+  logger.info(`Retrieved data for id ${requestedID}`)
+
+  delete connectionData.password;
+  const connectionGithubData = await getUserGitHubInfo(requestedID);
+  if (!connectionGithubData) {
+    logger.warn(`No GitHub info found for the id requestedID`)
+    connectionData.github_info = null;
+  } else {
+    connectionData.github_info = connectionGithubData;
+  }
+
+  return connectionData;
+}
+
 async function createUser(email, hashedPassword) {
   const query = 'INSERT INTO users ' +
     '(email, password, created_at) ' +
@@ -108,4 +140,5 @@ module.exports = {
    createUser,
    updateUser,
    getUserGitHubInfo,
-}
+   getFullConnectionProfile,
+};
