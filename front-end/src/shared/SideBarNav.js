@@ -20,10 +20,8 @@ class SideBarNav extends React.Component {
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/dashboard">Dashboard</Link></li>
-            {/* Commenting this out for now so that the customer doesn't get confused seeing this when logged in */}
-            {/* <li><Link to="/signup">Signup</Link></li> */}
-            {/* TODO: Implement both back end and front end */}
-            <li onClick={this.handleSignOut}><Link to ="#">Sign Out</Link></li>
+            <li><Link to="/connections">Connections</Link></li>
+            <li onClick={this.handleSignOut}><Link to="#">Sign Out</Link></li>
           </ul>
         </LinkList>
       </LeftPanel>

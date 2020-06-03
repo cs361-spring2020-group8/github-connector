@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import EditProfile from "./components/EditProfile";
 import { isLoggedIn } from './helpers/auth';
 import { PrivateRoute } from './helpers/privateRoute';
+import Connections from './components/Connections';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         </Route>
         <PrivateRoute path='/editprofile' component={EditProfile}/>
         <PrivateRoute path='/dashboard' component={Dashboard}/>
+        <PrivateRoute path='/connections' component={Connections} />
         <PrivateRoute path='/' component={Dashboard}/>
       </Switch>
     </Router>
