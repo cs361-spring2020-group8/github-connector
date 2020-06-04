@@ -35,14 +35,21 @@ class Connections extends React.Component {
     } else if (!this.state.connections.length) {
       return <span>No connections yet! Try adding some users from your <Link to="/recommendations">recommendations</Link>.</span>
     } else {
-      return this.state.connections.map(connection => (
-        <ConnectionsListItem
-          key={connection.id}
-          id={connection.id}
-          imageURL={connection.github_info.profile_image_url}
-          githubName={connection.github_info.github_username}
-        />
-      ))
+
+      return this.state.connections.map((connection) => {
+        const githubInfo = connection.github_info || {};
+        const profileImage = githubInfo.profile_image_url || process.env.PUBLIC_URL + '/default_avatar.png';
+        const name = githubInfo.github_username || connection.email
+
+        return (
+          <ConnectionsListItem
+            key={connection.id}
+            id={connection.id}
+            imageURL={profileImage}
+            username={name}
+          />
+        )
+      })
     }
   }
 

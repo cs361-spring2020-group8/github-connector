@@ -3,14 +3,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-const ConnectionsListItem = ({ id, imageURL, githubName }) => {
+const ConnectionsListItem = ({ id, imageURL, username }) => {
   return (
     <li>
       <ConnectionsUserContainer>
-        <UserImage src="https://avatars3.githubusercontent.com/u/30938547?v=4" alt="avatar" />
+        <UserImage src={imageURL} alt="avatar" />
         <span>
           <Link to={`/users/${id}`}>
-            {githubName}
+            {username}
           </Link>
         </span>
       </ConnectionsUserContainer>
@@ -21,7 +21,7 @@ const ConnectionsListItem = ({ id, imageURL, githubName }) => {
 ConnectionsListItem.propTypes = {
   id: PropTypes.string.isRequired,
   imageURL: PropTypes.string.isRequired,
-  githubName: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
 }
 
 const ConnectionsUserContainer = styled.div`
