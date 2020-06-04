@@ -4,6 +4,11 @@ import Logo from '../svg/Logo';
 import { Link } from "react-router-dom";
 
 class SideBarNav extends React.Component {
+  handleSignOut = () => {
+    localStorage.removeItem('access_token');
+    window.location.href = "/login";
+  }
+
   render() {
     return (
       <LeftPanel>
@@ -18,7 +23,7 @@ class SideBarNav extends React.Component {
             {/* Commenting this out for now so that the customer doesn't get confused seeing this when logged in */}
             {/* <li><Link to="/signup">Signup</Link></li> */}
             {/* TODO: Implement both back end and front end */}
-            <li><Link to="/">Sign Out</Link></li>
+            <li onClick={this.handleSignOut}><Link to ="#">Sign Out</Link></li>
           </ul>
         </LinkList>
       </LeftPanel>
@@ -33,7 +38,6 @@ const LinkList = styled.div`
   ul {
     list-style-type:none;
     padding:0;
-
   };
   ul li {
     margin-bottom:15px;
@@ -44,7 +48,6 @@ const LinkList = styled.div`
     background-color:#1A2E38;
     padding: 5px 10px 5px 10px;
   };
-
   ul li a:hover {
     background-color:#39667d;
   };

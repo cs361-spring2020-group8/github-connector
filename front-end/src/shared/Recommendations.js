@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { fetchRecommendedUsers } from '../api/RecommendationsApi';
+import { fetchRecommendedUsers, acceptOrRejectRecommendation } from '../api/RecommendationsApi';
 import { getUserIdFromJWT } from '../helpers/auth';
 import LoadingSpinner from '../shared/LoadingSpinner';
 import RecommendationsListItem from './RecommendationsListItem';
@@ -13,15 +13,15 @@ class Recommendations extends React.Component {
     hasError: false,
   }
 
+  userId = getUserIdFromJWT();
+
   componentDidMount() {
     this.getRecommendedUsers();
   }
 
   getRecommendedUsers = async () => {
-    const userId = getUserIdFromJWT();
-
     try {
-      const recommendedUsers = await fetchRecommendedUsers(userId);
+      const recommendedUsers = await fetchRecommendedUsers(this.userId);
 
       this.setState({ recommendedUsers, isLoading: false });
     } catch (err) {
@@ -29,14 +29,12 @@ class Recommendations extends React.Component {
     }
   }
 
-  handleInviteRequest = (userId) => async () => {
-    // TODO: add connection
-    alert(`TODO: Send invite to user ${userId}`);
+  handleInviteRequest = (matchId) => async () => {
+    await acceptOrRejectRecommendation(this.userId, matchId, true);
   }
 
-  handleIgnoreUser = (userId) => async () => {
-    // TODO: ignore user
-    alert(`TODO: Ignore user ${userId}`);
+  handleIgnoreUser = (matchId) => async () => {
+    await acceptOrRejectRecommendation(this.userId, matchId, false);
   }
 
   renderRecommendedUsersList = () => {
@@ -54,7 +52,7 @@ class Recommendations extends React.Component {
           return (
             <RecommendationsListItem
               key={user.id}
-              email={user.email}
+              github_username={user.github_username}
               onInvite={this.handleInviteRequest(user.id)}
               onIgnore={this.handleIgnoreUser(user.id)}
             />

@@ -6,7 +6,7 @@ const {check, body, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
-const { getUserByEmail, getFullUserProfile, getRecommendations, createUser, updateUser, getUserGitHubInfo, getFullConnectionProfile } = require('../helpers/user-helpers')
+const { getUserByEmail, getFullUserProfile, getRecommendations, updateConnectionStatus, createUser, updateUser, getUserGitHubInfo, getFullConnectionProfile } = require('../helpers/user-helpers')
 const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage, returnNotFound } = require('../helpers/response-helpers')
 const { validateSelfJWT } = require('../middlewares/jwt-validators');
 const { checkValidation } = require('../middlewares/body-validators');
@@ -88,7 +88,8 @@ router.get('/:id/recommendations', async function(req, res, next) {
   const userID = req.params.id;
 
   // use helper to retrieve recommendation list.
-  let responseBody = await getRecommendations(userID);
+
+  let responseBody = await getRecommendations(userID, 5)
 
   if(responseBody) {
     return res.status(200).send(responseBody);
@@ -171,6 +172,28 @@ router.put(
       );
 
       return res.status(200).json(savedGitHubInfo);
+    } catch (err) {
+      logger.error(`An error occurred: ${err}`);
+      return res.status(500).json(err);
+    }
+  }
+);
+
+// Accept/reject recommendations
+router.put(
+  '/:id/recommendations',
+  validateSelfJWT,
+  [body('id').exists(), body('accepted').exists()],
+  checkValidation,
+  async (req, res) => {
+    const selfID = req.params.id;
+    const matchID = Number.parseInt(req.body.id, 10);
+    const accepted = req.body.accepted
+
+    try {
+      logger.info(`Updating the connection status for user ${selfID} and ${matchID}`);
+      const connectionStatus = await updateConnectionStatus(selfID, matchID, accepted);
+      return res.status(200).send();
     } catch (err) {
       logger.error(`An error occurred: ${err}`);
       return res.status(500).json(err);

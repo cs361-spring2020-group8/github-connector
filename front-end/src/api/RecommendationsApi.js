@@ -12,10 +12,18 @@ function getAxiosConfig() {
     },
     baseURL,
   }
-} 
+}
 
 export async function fetchRecommendedUsers(userId) {
   const response = await axios.get(`/users/${userId}/recommendations`, getAxiosConfig());
 
   return response.data;
+}
+
+export async function acceptOrRejectRecommendation(selfId, matchId, accept) {
+  const payload = {
+    'id': matchId,
+    'accepted': accept,
+  };
+  return await axios.put(`/users/${selfId}/recommendations`, payload, getAxiosConfig());
 }
