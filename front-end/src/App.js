@@ -11,6 +11,7 @@ import EditProfile from "./components/EditProfile";
 import { isLoggedIn } from './helpers/auth';
 import { PrivateRoute } from './helpers/privateRoute';
 import Connections from './components/Connections';
+import UserProfile from "./components/UserProfile";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <PrivateRoute path='/editprofile' component={EditProfile}/>
         <PrivateRoute path='/dashboard' component={Dashboard}/>
         <PrivateRoute path='/connections' component={Connections} />
+        <PrivateRoute path='/users/:id' component={UserProfile} />
         <PrivateRoute path='/' component={Dashboard}/>
       </Switch>
     </Router>

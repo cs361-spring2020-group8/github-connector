@@ -23,6 +23,26 @@ export async function fetchConnections(userId) {
         profile_image_url: 'https://avatars3.githubusercontent.com/u/30938547?v=4',
         github_username: 'jonabantao',
       }
-    }]), 3000); 
+    }]), 3000);
+  });
+}
+
+export async function getUserConnection(userId) {
+  // TODO: Backend work
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({
+      "id": 1,
+      "created_at": "2020-05-31T22:32:32.985Z",
+      "twitter": "faketwitter",
+      "phone": "555-555-5555",
+      "email": "test12345@gmail.com",
+      "github_info": {
+        "id": 1,
+        "user_id": 1,
+        "github_username": "jonabantao",
+        "profile_image_url": "https://avatars3.githubusercontent.com/u/30938547?v=4",
+        "language": "JavaScript"
+      }
+    }), 3000);
   });
 }
