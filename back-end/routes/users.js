@@ -6,7 +6,7 @@ const {check, body, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
-const { getUserByEmail, getFullUserProfile, getRecommendations, updateConnectionStatus, createUser, updateUser, getUserGitHubInfo } = require('../helpers/user-helpers')
+const { getUserByEmail, getFullUserProfile, getRecommendations, updateConnectionStatus, createUser, updateUser, getUserGitHubInfo, getUserConnections } = require('../helpers/user-helpers')
 const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage, returnNotFound } = require('../helpers/response-helpers')
 const { validateSelfJWT } = require('../middlewares/jwt-validators');
 const { checkValidation } = require('../middlewares/body-validators');
@@ -227,6 +227,31 @@ router.put('/:id', validateSelfJWT, [
     } catch(err){
       res.status(500).send(err);
     }
+});
+
+router.get(
+  '/:id/connections',
+  validateSelfJWT,
+  checkValidation,
+  async function (req, res, next) {
+    const userID = req.params.id;
+
+    logger.info(`Retrieving list of connections for user ${userID}`);
+
+    try {
+      const connections = await getUserConnections(userID);
+
+      if (!connections) {
+        logger.error(`Unable to retrieve connections for user ${userID}`);
+        return res.status(404).send('Not found.');
+      }
+
+      res.status(200).send(connections);
+    } catch(err) {
+      logger.error(`Unexpected error: ${err}`)
+      res.status(500).send(err);
+    }
+
 });
 
 module.exports = router;
