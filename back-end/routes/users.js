@@ -20,7 +20,7 @@ const PASSWORD_MIN_LENGTH = 8;
 /* GET user by ID */
 router.get('/:id', async function(req, res, next) {
 
-  const requestedID = req.params.id;
+  const requestedID = parseInt(req.params.id, 10);
 
   // verify user has permission to get this data
   const userID = await getUserIdFromToken(req, res);
