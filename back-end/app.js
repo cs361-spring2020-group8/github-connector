@@ -27,10 +27,9 @@ const origin = {
 };
 app.use(cors(origin));
 
-// limits a client to 10 requests per minute.
 const limiter = rateLimit({
     windowMs: 1*60*1000,
-    max: 10,
+    max: 100,               // max requests per minute
 });
 app.use(limiter);
 
