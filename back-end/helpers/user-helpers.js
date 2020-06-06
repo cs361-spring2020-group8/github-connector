@@ -254,6 +254,35 @@ async function updateUser(userObject, userID) {
   return await makeDbQuery(queryString);
 }
 
+async function getUserConnections(userID) {
+  const query = 'SELECT users.* FROM users '  +
+    'JOIN connections ON (users.id = connections.user1_id ' +
+    'OR users.id = connections.user2_id) ' +
+    'WHERE (connections.user1_id = $1 OR connections.user2_id = $1) ' +
+    'AND users.id <> $1 ' +
+    'AND connections.connection_accepted = true';
+
+  const res = await queryWithParametersForMultipleRows(
+    query,
+    [userID]
+  );
+
+  const connectionPromises = res.map(async function (connection) {
+    const { password, created_at, ...userPublicData } = connection;
+    const githubData = await getUserGitHubInfo(userPublicData.id);
+    if (!githubData) {
+      logger.warn(`Unable to get GitHub data for the connection ${userPublicData.id}`);
+      userPublicData.github_info = null;
+    } else {
+      userPublicData.github_info = githubData;
+    }
+
+    return userPublicData;
+  });
+
+  return Promise.all(connectionPromises);
+}
+
 module.exports = {
    getUserByEmail,
    getFullUserProfile,
@@ -263,4 +292,5 @@ module.exports = {
    getUserGitHubInfo,
    getFullConnectionProfile,
    updateConnectionStatus,
-};
+   getUserConnections,
+}
