@@ -14,16 +14,14 @@ function getAxiosConfig() {
   }
 }
 
-export async function fetchRecommendedUsers(userId) {
-  const response = await axios.get(`/users/${userId}/recommendations`, getAxiosConfig());
+export async function fetchConnections(userId) {
+  const response = await axios.get(`users/${userId}/connections`, getAxiosConfig());
 
   return response.data;
 }
 
-export async function acceptOrRejectRecommendation(selfId, matchId, accept) {
-  const payload = {
-    'id': matchId,
-    'accepted': accept,
-  };
-  return await axios.put(`/users/${selfId}/recommendations`, payload, getAxiosConfig());
+export async function getUserConnection(userId) {
+  const response = await axios.get(`users/${userId}`, getAxiosConfig());
+
+  return response.data[0];
 }

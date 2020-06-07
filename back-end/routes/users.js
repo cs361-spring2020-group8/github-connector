@@ -6,8 +6,8 @@ const {check, body, validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const { createJWT, getUserIdFromToken } = require('../helpers/jwt-helpers')
-const { getUserByEmail, getFullUserProfile, getRecommendations, createUser, updateUser, getUserGitHubInfo } = require('../helpers/user-helpers')
-const { rejectAsUnauthorized, returnGeneralError, returnErrorWithMessage, returnNotFound } = require('../helpers/response-helpers')
+const { getUserByEmail, getFullUserProfile, getRecommendations, updateConnectionStatus, createUser, updateUser, getUserGitHubInfo, getUserConnections, getFullConnectionProfile } = require('../helpers/user-helpers')
+const { returnErrorWithMessage, returnNotFound } = require('../helpers/response-helpers')
 const { validateSelfJWT } = require('../middlewares/jwt-validators');
 const { checkValidation } = require('../middlewares/body-validators');
 const GitHubAPI = require('../api/github-api');
@@ -18,16 +18,25 @@ const PASSWORD_MIN_LENGTH = 8;
 
 // user routes
 /* GET user by ID */
-router.get('/:id', validateSelfJWT, async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
+
+  const requestedID = parseInt(req.params.id, 10);
+
   // verify user has permission to get this data
   const userID = await getUserIdFromToken(req, res);
+  let responseBody;
 
-  logger.info(`Getting full user profile for user ${userID}`);
+  if (requestedID !== userID) {
+    logger.info('Requested ID is different from User ID. Getting full user profile for possible connection');
+    responseBody = await getFullConnectionProfile(requestedID, userID);
+  } else {
+    logger.info(`Getting full user profile for user ${requestedID}`);
+    responseBody = await getFullUserProfile(requestedID);
+  }
 
-  let responseBody = await getFullUserProfile(userID);
   if (!responseBody) {
     // no user data could be found
-    logger.warn(`User with id ${userId} not found in database`);
+    logger.warn(`User with id ${requestedID} not found in database`);
     return res.status(404).send('Not found.');
   }
   return res.status(200).send([responseBody]);
@@ -79,7 +88,8 @@ router.get('/:id/recommendations', async function(req, res, next) {
   const userID = req.params.id;
 
   // use helper to retrieve recommendation list.
-  let responseBody = await getRecommendations(userID);
+
+  let responseBody = await getRecommendations(userID, 5)
 
   if(responseBody) {
     return res.status(200).send(responseBody);
@@ -169,6 +179,28 @@ router.put(
   }
 );
 
+// Accept/reject recommendations
+router.put(
+  '/:id/recommendations',
+  validateSelfJWT,
+  [body('id').exists(), body('accepted').exists()],
+  checkValidation,
+  async (req, res) => {
+    const selfID = req.params.id;
+    const matchID = Number.parseInt(req.body.id, 10);
+    const accepted = req.body.accepted
+
+    try {
+      logger.info(`Updating the connection status for user ${selfID} and ${matchID}`);
+      const connectionStatus = await updateConnectionStatus(selfID, matchID, accepted);
+      return res.status(200).send();
+    } catch (err) {
+      logger.error(`An error occurred: ${err}`);
+      return res.status(500).json(err);
+    }
+  }
+);
+
 /* PUT to update select user information */
 // Allows user to modify select attributes of his or her profile
 router.put('/:id', validateSelfJWT, [
@@ -204,6 +236,31 @@ router.put('/:id', validateSelfJWT, [
     } catch(err){
       res.status(500).send(err);
     }
+});
+
+router.get(
+  '/:id/connections',
+  validateSelfJWT,
+  checkValidation,
+  async function (req, res, next) {
+    const userID = req.params.id;
+
+    logger.info(`Retrieving list of connections for user ${userID}`);
+
+    try {
+      const connections = await getUserConnections(userID);
+
+      if (!connections) {
+        logger.error(`Unable to retrieve connections for user ${userID}`);
+        return res.status(404).send('Not found.');
+      }
+
+      res.status(200).send(connections);
+    } catch(err) {
+      logger.error(`Unexpected error: ${err}`)
+      res.status(500).send(err);
+    }
+
 });
 
 module.exports = router;
